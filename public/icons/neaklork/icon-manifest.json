@@ -1,0 +1,461 @@
+[
+  {
+    "filename": "add_user.png",
+    "purpose": "Add customer/user",
+    "suggested_usage": "Use for adding a new customer or seller contact.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "alert_triangle.png",
+    "purpose": "Warning alert",
+    "suggested_usage": "Use in validation, risk, or caution banners.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "app_logo_bag.png",
+    "purpose": "NeakLork app logo",
+    "suggested_usage": "Use as app logo, launcher icon source, or splash branding.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "arrow_left.png",
+    "purpose": "Back navigation",
+    "suggested_usage": "Use for mobile back buttons.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "box_not_yet.png",
+    "purpose": "Order not prepared yet",
+    "suggested_usage": "Use for pending packing/stock preparation.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "calendar.png",
+    "purpose": "Date/calendar",
+    "suggested_usage": "Use for sales date filters and reminders.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "check_delivered.png",
+    "purpose": "Delivered confirmation",
+    "suggested_usage": "Use when an order is successfully delivered.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "chevron_down.png",
+    "purpose": "Expand dropdown",
+    "suggested_usage": "Use for dropdowns, accordions, and selectors.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "chevron_right.png",
+    "purpose": "Next/details",
+    "suggested_usage": "Use for list item navigation.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "copy.png",
+    "purpose": "Copy action",
+    "suggested_usage": "Use for copying IDs, phone numbers, and order codes.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "copy_message.png",
+    "purpose": "Copy message template",
+    "suggested_usage": "Use for copying customer chat/payment reminder messages.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "customers_group.png",
+    "purpose": "Customer group",
+    "suggested_usage": "Use for customer list and CRM views.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "dashboard_grid.png",
+    "purpose": "Dashboard grid",
+    "suggested_usage": "Use for home dashboard cards or app overview.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "delivery_status_truck.png",
+    "purpose": "Delivery status",
+    "suggested_usage": "Use for delivery tracking cards.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "edit_pencil.png",
+    "purpose": "Edit",
+    "suggested_usage": "Use for editing orders, customer details, and products.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "eye.png",
+    "purpose": "View/preview",
+    "suggested_usage": "Use for opening order/customer details.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "filter.png",
+    "purpose": "Filter",
+    "suggested_usage": "Use for order, customer, and report filters.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "help_circle.png",
+    "purpose": "Help",
+    "suggested_usage": "Use for support and help center actions.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "info_circle.png",
+    "purpose": "Information",
+    "suggested_usage": "Use for info callouts and tooltips.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "logout.png",
+    "purpose": "Logout",
+    "suggested_usage": "Use for sign out buttons.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "minus.png",
+    "purpose": "Remove/decrease",
+    "suggested_usage": "Use for quantity decrease or collapsed state.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "move.png",
+    "purpose": "Move order status",
+    "suggested_usage": "Use for moving an order to another workflow status.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "nav_add_order_plus.png",
+    "purpose": "Primary add order nav",
+    "suggested_usage": "Use for the center/add order bottom navigation action.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "nav_customers.png",
+    "purpose": "Customers nav",
+    "suggested_usage": "Use in bottom navigation for customers.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "nav_home.png",
+    "purpose": "Home nav",
+    "suggested_usage": "Use in bottom navigation for dashboard/home.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "nav_reports.png",
+    "purpose": "Reports nav",
+    "suggested_usage": "Use in bottom navigation for reports.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "nav_settings.png",
+    "purpose": "Settings nav",
+    "suggested_usage": "Use in bottom navigation for settings.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "need_action_need_delivery.png",
+    "purpose": "Needs delivery action",
+    "suggested_usage": "Use for action cards requiring delivery follow-up.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "need_action_need_payment.png",
+    "purpose": "Needs payment action",
+    "suggested_usage": "Use for payment reminder action cards.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "need_action_new_orders.png",
+    "purpose": "New orders action",
+    "suggested_usage": "Use for new order queue/action cards.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "need_action_problem_orders.png",
+    "purpose": "Problem orders action",
+    "suggested_usage": "Use for issue/escalation action cards.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "orders_clipboard.png",
+    "purpose": "Orders",
+    "suggested_usage": "Use for order list and order management screens.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "payment_card.png",
+    "purpose": "Payment card/KHQR",
+    "suggested_usage": "Use for payment methods, reminders, and payment status.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "phone.png",
+    "purpose": "Phone contact",
+    "suggested_usage": "Use for customer phone/call actions.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "plus.png",
+    "purpose": "Add/create",
+    "suggested_usage": "Use for generic add buttons.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "products_box.png",
+    "purpose": "Products/inventory",
+    "suggested_usage": "Use for product or stock management.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "radio_checked.png",
+    "purpose": "Selected radio",
+    "suggested_usage": "Use for selected payment/status options.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "radio_unchecked.png",
+    "purpose": "Unselected radio",
+    "suggested_usage": "Use for unselected payment/status options.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "reminders_bell.png",
+    "purpose": "Reminder bell",
+    "suggested_usage": "Use for payment/delivery reminder scheduling.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "reports_chart.png",
+    "purpose": "Analytics report",
+    "suggested_usage": "Use for daily sales and analytics reports.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "return_returned.png",
+    "purpose": "Returned order",
+    "suggested_usage": "Use for returned/refunded orders.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "search.png",
+    "purpose": "Search",
+    "suggested_usage": "Use for search inputs and lookup actions.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "settings_gear.png",
+    "purpose": "Settings",
+    "suggested_usage": "Use for settings screens and preferences.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "status_confirmed.png",
+    "purpose": "Confirmed status",
+    "suggested_usage": "Use for confirmed order status badges.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "status_delivering.png",
+    "purpose": "Delivering status",
+    "suggested_usage": "Use for active delivery status badges.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "status_new.png",
+    "purpose": "New status",
+    "suggested_usage": "Use for new order status badges.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "status_packing.png",
+    "purpose": "Packing status",
+    "suggested_usage": "Use for packing/preparing status badges.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "status_paid.png",
+    "purpose": "Paid status",
+    "suggested_usage": "Use for paid order status badges.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "status_problem.png",
+    "purpose": "Problem status",
+    "suggested_usage": "Use for problem order status badges.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "telegram.png",
+    "purpose": "Telegram paper plane",
+    "suggested_usage": "Use for Telegram share/contact integrations.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  },
+  {
+    "filename": "truck_delivering.png",
+    "purpose": "Delivering truck",
+    "suggested_usage": "Use for delivery flow, courier, and shipment screens.",
+    "size": "512x512",
+    "format": "PNG",
+    "background": "transparent",
+    "style": "modern iOS-inspired rounded duotone NeakLork icon system"
+  }
+]
