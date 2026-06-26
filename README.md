@@ -73,3 +73,25 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## Deploy To Vercel
+
+This project is initialized for Vercel deployment.
+
+Vercel settings:
+
+- Framework Preset: `Nuxt.js`
+- Install Command: `npm install`
+- Build Command: `npm run build`
+- Development Command: `npm run dev`
+- Node.js Version: `22.x`
+
+Deploy from the Vercel dashboard by importing this repository, or deploy with the Vercel CLI:
+
+```bash
+npm install
+npm run build
+vercel
+```
+
+Do not commit real `.env` files. Add required production variables in the Vercel project settings.

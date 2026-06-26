@@ -1,0 +1,19 @@
+# Dependencies and generated output
+node_modules
+.nuxt
+.nitro
+.output
+.data
+dist
+
+# Local tooling and cache
+.cache
+.vercel
+coverage
+*.log
+
+# Local-only files
+.DS_Store
+.env
+.env.*
+!.env.example
