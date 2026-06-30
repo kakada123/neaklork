@@ -6,13 +6,7 @@ import {
 } from "../../utils/auth";
 
 interface TelegramAuthBody {
-  id: string | number;
-  first_name?: string;
-  last_name?: string;
-  username?: string;
-  photo_url?: string;
-  auth_date: string | number;
-  hash: string;
+  idToken: string;
 }
 
 export default defineEventHandler(async (event) => {

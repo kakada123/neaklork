@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthProvider } from '@prisma/client';
 import type { RefreshToken, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 import type { StringValue } from 'ms';
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -27,6 +28,10 @@ import { toSafeUser } from './utils/user-response.mapper';
 
 const PASSWORD_HASH_ROUNDS = 12;
 const TELEGRAM_AUTH_MAX_AGE_SECONDS = 24 * 60 * 60;
+const TELEGRAM_OIDC_ISSUER = 'https://oauth.telegram.org';
+const TELEGRAM_OIDC_JWKS = createRemoteJWKSet(
+  new URL('https://oauth.telegram.org/.well-known/jwks.json'),
+);
 
 interface GoogleTokenInfo {
   sub: string;
@@ -221,7 +226,9 @@ export class AuthService {
     dto: TelegramAuthDto,
     context: AuthRequestContext,
   ): Promise<AuthResponse> {
-    const profile = this.verifyTelegramPayload(dto);
+    const profile = dto.idToken
+      ? await this.verifyTelegramIdToken(dto.idToken)
+      : this.verifyTelegramPayload(dto);
     const user = await this.usersService.findOrCreateSocialUser(profile);
     this.assertActiveUser(user);
 
@@ -471,6 +478,39 @@ export class AuthService {
       name,
       avatarUrl: dto.photo_url,
     };
+  }
+
+  private async verifyTelegramIdToken(idToken: string): Promise<SocialUserInput> {
+    const clientId = this.configService.getOrThrow<string>('TELEGRAM_CLIENT_ID');
+
+    try {
+      const { payload } = await jwtVerify(idToken, TELEGRAM_OIDC_JWKS, {
+        issuer: TELEGRAM_OIDC_ISSUER,
+        audience: clientId,
+      });
+
+      const providerUserId = payload.id ?? payload.sub;
+
+      if (
+        (typeof providerUserId !== 'string' && typeof providerUserId !== 'number') ||
+        !providerUserId
+      ) {
+        throw new UnauthorizedException('Invalid Telegram login token');
+      }
+
+      return {
+        provider: AuthProvider.TELEGRAM,
+        providerUserId: String(providerUserId),
+        username:
+          typeof payload.preferred_username === 'string'
+            ? payload.preferred_username
+            : null,
+        name: typeof payload.name === 'string' ? payload.name : null,
+        avatarUrl: typeof payload.picture === 'string' ? payload.picture : null,
+      };
+    } catch {
+      throw new UnauthorizedException('Invalid Telegram login token');
+    }
   }
 
   private buildTelegramDataCheckString(dto: TelegramAuthDto) {

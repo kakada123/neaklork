@@ -1,6 +1,11 @@
-import { IsDefined, IsOptional, IsString } from 'class-validator';
+import { IsDefined, IsOptional, IsString, ValidateIf } from 'class-validator';
 
 export class TelegramAuthDto {
+  @IsOptional()
+  @IsString()
+  idToken?: string;
+
+  @ValidateIf((o: TelegramAuthDto) => !o.idToken)
   @IsDefined()
   id!: string | number;
 
@@ -20,9 +25,11 @@ export class TelegramAuthDto {
   @IsString()
   photo_url?: string;
 
+  @ValidateIf((o: TelegramAuthDto) => !o.idToken)
   @IsDefined()
   auth_date!: string | number;
 
+  @ValidateIf((o: TelegramAuthDto) => !o.idToken)
   @IsString()
   hash!: string;
 }

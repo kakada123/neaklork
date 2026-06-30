@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import type { TelegramAuthPayload } from "~/composables/useAuth";
-
 interface GoogleCredentialResponse {
   credential?: string;
+}
+
+interface TelegramLoginResponse {
+  id_token?: string;
+  error?: string;
 }
 
 interface FacebookLoginResponse {
@@ -47,7 +50,7 @@ declare global {
         };
       };
     };
-    onNeaklorkTelegramAuth?: (payload: TelegramAuthPayload) => void;
+    onNeaklorkTelegramAuth?: (payload: TelegramLoginResponse) => void;
   }
 }
 
@@ -66,11 +69,11 @@ const setupError = ref("");
 
 const googleClientId = computed(() => config.public.googleClientId);
 const facebookAppId = computed(() => config.public.facebookAppId);
-const telegramBotName = computed(() => config.public.telegramBotName);
+const telegramClientId = computed(() => config.public.telegramClientId);
 
 const hasGoogle = computed(() => Boolean(googleClientId.value));
 const hasFacebook = computed(() => Boolean(facebookAppId.value));
-const hasTelegram = computed(() => Boolean(telegramBotName.value));
+const hasTelegram = computed(() => Boolean(telegramClientId.value));
 
 function loadScript(id: string, src: string) {
   return new Promise<void>((resolve, reject) => {
@@ -206,19 +209,27 @@ function setupTelegramWidget() {
   }
 
   window.onNeaklorkTelegramAuth = (payload) => {
-    void runSocialAuth("telegram", () => loginWithTelegram(payload));
+    if (payload.error) {
+      emit("error", payload.error);
+      return;
+    }
+
+    if (!payload.id_token) {
+      emit("error", "Telegram did not return an ID token");
+      return;
+    }
+
+    void runSocialAuth("telegram", () => loginWithTelegram(payload.id_token!));
   };
 
   telegramWidgetRef.value.innerHTML = "";
 
   const script = document.createElement("script");
-  script.src = "https://telegram.org/js/telegram-widget.js?22";
+  script.src = "https://oauth.telegram.org/js/telegram-login.js?5";
   script.async = true;
-  script.setAttribute("data-telegram-login", telegramBotName.value);
-  script.setAttribute("data-size", "large");
-  script.setAttribute("data-radius", "18");
+  script.setAttribute("data-client-id", telegramClientId.value);
   script.setAttribute("data-request-access", "write");
-  script.setAttribute("data-onauth", "onNeaklorkTelegramAuth(user)");
+  script.setAttribute("data-onauth", "onNeaklorkTelegramAuth(data)");
 
   telegramWidgetRef.value.appendChild(script);
 }

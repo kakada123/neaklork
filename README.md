@@ -107,7 +107,7 @@ Frontend runtime variables:
 NUXT_API_BASE_URL=http://localhost:3001
 NUXT_PUBLIC_GOOGLE_CLIENT_ID=
 NUXT_PUBLIC_FACEBOOK_APP_ID=
-NUXT_PUBLIC_TELEGRAM_BOT_NAME=
+NUXT_PUBLIC_TELEGRAM_CLIENT_ID=
 ```
 
 The public provider keys enable the Google, Facebook, and Telegram buttons on

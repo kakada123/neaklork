@@ -21,13 +21,7 @@ interface SignupPayload extends LoginPayload {
 }
 
 export interface TelegramAuthPayload {
-  id: string | number;
-  first_name?: string;
-  last_name?: string;
-  username?: string;
-  photo_url?: string;
-  auth_date: string | number;
-  hash: string;
+  idToken: string;
 }
 
 export function getAuthErrorMessage(error: unknown) {
@@ -121,10 +115,10 @@ export function useAuth() {
     return response.user;
   }
 
-  async function loginWithTelegram(payload: TelegramAuthPayload) {
+  async function loginWithTelegram(idToken: string) {
     const response = await $fetch<AuthUserResponse>("/api/auth/telegram", {
       method: "POST",
-      body: payload,
+      body: { idToken },
     });
 
     user.value = response.user;

@@ -48,7 +48,7 @@ export default defineNuxtConfig({
     public: {
       googleClientId: "",
       facebookAppId: "",
-      telegramBotName: "",
+      telegramClientId: "",
     },
   },
   css: [
