@@ -5,6 +5,12 @@ definePageMeta({
 });
 
 const { shop, actionItems } = useNeaklorkMock();
+const { user } = useAuth();
+
+const displayShopName = computed(() => user.value?.name || shop.name);
+const displayShopId = computed(() =>
+  user.value?.id ? `#${user.value.id.slice(-6).toUpperCase()}` : shop.id,
+);
 </script>
 
 <template>
@@ -43,7 +49,7 @@ const { shop, actionItems } = useNeaklorkMock();
     >
       <img
         src="/image/saller/kakada.png"
-        :alt="shop.name"
+        :alt="displayShopName"
         class="h-12 w-12 flex-none rounded-full object-cover object-center"
       />
 
@@ -51,13 +57,13 @@ const { shop, actionItems } = useNeaklorkMock();
         <h2
           class="m-0 truncate text-[16px] font-extrabold leading-[1.08] tracking-[-0.45px] text-[var(--text)]"
         >
-          {{ shop.name }}
+          {{ displayShopName }}
         </h2>
 
         <p
           class="m-0 mt-[6px] text-[12px] font-medium leading-none tracking-[-0.2px] text-[var(--muted)]"
         >
-          ID: {{ shop.id }}
+          ID: {{ displayShopId }}
         </p>
       </div>
 

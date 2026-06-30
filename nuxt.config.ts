@@ -41,6 +41,14 @@ function exposeAppPagesAtRoot(routes: AppRoute[]) {
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
+  runtimeConfig: {
+    apiBaseUrl: "http://localhost:3001",
+    public: {
+      googleClientId: "",
+      facebookAppId: "",
+      telegramBotName: "",
+    },
+  },
   css: [
     "primeicons/primeicons.css",
     "~/assets/scss/tailwind.scss",

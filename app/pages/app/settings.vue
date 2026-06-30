@@ -13,6 +13,11 @@ interface MenuItem {
 
 const route = useRoute();
 const { shop } = useNeaklorkMock();
+const { user, logout } = useAuth();
+const isLoggingOut = ref(false);
+
+const displayShopName = computed(() => user.value?.name || shop.name);
+const displayShopOwner = computed(() => user.value?.email || shop.owner);
 
 const menuItems: MenuItem[] = [
   {
@@ -66,6 +71,17 @@ const menuItems: MenuItem[] = [
 ];
 
 const isActive = (item: MenuItem) => item.match(route.path);
+
+async function handleLogout() {
+  isLoggingOut.value = true;
+
+  try {
+    await logout();
+    await navigateTo("/login");
+  } finally {
+    isLoggingOut.value = false;
+  }
+}
 </script>
 
 <template>
@@ -76,7 +92,7 @@ const isActive = (item: MenuItem) => item.match(route.path);
     >
       <img
         src="/image/saller/kakada.png"
-        :alt="shop.name"
+        :alt="displayShopName"
         class="h-12 w-12 flex-none rounded-full object-cover object-center"
       />
 
@@ -84,13 +100,13 @@ const isActive = (item: MenuItem) => item.match(route.path);
         <h1
           class="m-0 truncate text-[16px] font-extrabold leading-[1.08] tracking-[-0.45px] text-[var(--text)]"
         >
-          {{ shop.name }}
+          {{ displayShopName }}
         </h1>
 
         <p
           class="m-0 mt-[6px] truncate text-[12px] font-medium leading-none tracking-[-0.2px] text-[var(--muted)]"
         >
-          {{ shop.owner }}
+          {{ displayShopOwner }}
         </p>
       </div>
     </section>
@@ -140,6 +156,8 @@ const isActive = (item: MenuItem) => item.match(route.path);
       <button
         class="flex min-h-[54px] w-full items-center gap-[15px] border-t border-[var(--line)] bg-transparent"
         type="button"
+        :disabled="isLoggingOut"
+        @click="handleLogout"
       >
         <span
           class="grid h-[34px] w-[34px] flex-none place-items-center rounded-full text-[var(--red)]"
@@ -150,7 +168,7 @@ const isActive = (item: MenuItem) => item.match(route.path);
         <span
           class="flex-1 text-left text-[14px] font-semibold leading-none tracking-[-0.35px] text-[var(--red)]"
         >
-          Logout
+          {{ isLoggingOut ? "Logging out..." : "Logout" }}
         </span>
 
         <span class="h-[14px] w-[14px] flex-none" aria-hidden="true" />

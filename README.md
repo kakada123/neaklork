@@ -95,3 +95,20 @@ vercel
 ```
 
 Do not commit real `.env` files. Add required production variables in the Vercel project settings.
+
+## Auth Configuration
+
+The Nuxt app proxies auth through server routes and stores Nest API tokens in
+HttpOnly cookies.
+
+Frontend runtime variables:
+
+```env
+NUXT_API_BASE_URL=http://localhost:3001
+NUXT_PUBLIC_GOOGLE_CLIENT_ID=
+NUXT_PUBLIC_FACEBOOK_APP_ID=
+NUXT_PUBLIC_TELEGRAM_BOT_NAME=
+```
+
+The public provider keys enable the Google, Facebook, and Telegram buttons on
+`/login` and `/signup`. Keep provider secrets only in the Nest API env.
