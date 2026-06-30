@@ -39,6 +39,8 @@ function exposeAppPagesAtRoot(routes: AppRoute[]) {
 }
 
 export default defineNuxtConfig({
+  // Deploy the UI as a SPA so Vercel only needs serverless functions for /api routes.
+  ssr: false,
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
   runtimeConfig: {
