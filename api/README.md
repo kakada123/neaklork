@@ -18,12 +18,7 @@ Create a local `.env` file from the safe example keys below. Do not commit real
 secret values.
 
 ```env
-DB_CONNECTION=postgres
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-DB_DATABASE=neaklork
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/neaklork
 JWT_ACCESS_SECRET=
 JWT_REFRESH_SECRET=
 JWT_ACCESS_EXPIRES_IN=15m
@@ -36,8 +31,7 @@ NUXT_WEB_ORIGIN=http://localhost:3000
 PORT=3001
 ```
 
-`DATABASE_URL` is still supported as an optional fallback. If it is not set, the
-API and Prisma scripts build the PostgreSQL URL from the separate `DB_*` keys.
+`DATABASE_URL` is required for both API runtime and Prisma scripts.
 `npm run build` runs `prisma:generate` first so generated Prisma model and enum
 types stay in sync before TypeScript compiles.
 
