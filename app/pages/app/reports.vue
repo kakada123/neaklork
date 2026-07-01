@@ -9,8 +9,24 @@ const { topProducts, orders } = useNeaklorkMock();
 const activeRange = ref("Today");
 const ranges = ["Today", "This Week", "This Month"];
 
+const rangeSeries = computed(() => {
+  const sortedOrders = [...orders.value].sort(
+    (left, right) => Number(left.id) - Number(right.id),
+  );
+
+  if (activeRange.value === "Today") {
+    return sortedOrders.slice(0, 4);
+  }
+
+  if (activeRange.value === "This Week") {
+    return sortedOrders.slice(0, 5);
+  }
+
+  return sortedOrders;
+});
+
 const reportsSummary = computed(() => {
-  const orderList = orders.value;
+  const orderList = rangeSeries.value;
   const paidOrders = orderList.filter((order) => order.paymentStatus === "paid");
   const unpaidOrders = orderList.filter((order) => order.paymentStatus !== "paid");
 
@@ -22,6 +38,61 @@ const reportsSummary = computed(() => {
     orders: orderList.length,
     paid: paidOrders.length,
     unpaid: unpaidOrders.length,
+  };
+});
+
+const chartData = computed(() => {
+  const values = rangeSeries.value.map((order, index) => ({
+    label: order.id,
+    value: Number(order.amount.replace(/[^0-9.]/g, "")),
+    index,
+  }));
+
+  const width = 360;
+  const height = 190;
+  const padding = { left: 34, right: 16, top: 24, bottom: 36 };
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+  const maxValue = Math.max(...values.map((item) => item.value), 1);
+  const minValue = Math.min(...values.map((item) => item.value), 0);
+  const valueRange = Math.max(maxValue - minValue, 1);
+  const step = values.length > 1 ? innerWidth / (values.length - 1) : 0;
+
+  const points = values.map((item, index) => {
+    const x = padding.left + index * step;
+    const normalized = (item.value - minValue) / valueRange;
+    const y = padding.top + (1 - normalized) * innerHeight;
+
+    return {
+      ...item,
+      x,
+      y,
+    };
+  });
+
+  const path = points.length
+    ? points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ")
+    : "";
+
+  const areaPath = points.length
+    ? `${path} L ${padding.left + innerWidth} ${padding.top + innerHeight} L ${padding.left} ${padding.top + innerHeight} Z`
+    : "";
+
+  const ticks = Array.from({ length: 5 }, (_, index) => {
+    const ratio = index / 4;
+    const value = maxValue - ratio * valueRange;
+
+    return {
+      value,
+      y: padding.top + ratio * innerHeight,
+    };
+  });
+
+  return {
+    points,
+    path,
+    areaPath,
+    ticks,
   };
 });
 </script>
@@ -178,26 +249,38 @@ const reportsSummary = computed(() => {
         aria-label="Hourly sales line chart"
       >
         <g stroke="#e5e7eb" stroke-dasharray="3 4" stroke-width="1">
-          <line x1="34" y1="24" x2="344" y2="24" />
-          <line x1="34" y1="62" x2="344" y2="62" />
-          <line x1="34" y1="100" x2="344" y2="100" />
-          <line x1="34" y1="138" x2="344" y2="138" />
+          <line
+            v-for="tick in chartData.ticks"
+            :key="tick.y"
+            x1="34"
+            :y1="tick.y"
+            x2="344"
+            :y2="tick.y"
+          />
         </g>
 
         <g fill="#6b7280" font-size="11">
-          <text x="8" y="28">500</text>
-          <text x="8" y="66">375</text>
-          <text x="8" y="104">250</text>
-          <text x="8" y="142">125</text>
-          <text x="18" y="174">0</text>
-          <text x="34" y="188">00:00</text>
-          <text x="110" y="188">06:00</text>
-          <text x="192" y="188">12:00</text>
-          <text x="278" y="188">18:00</text>
+          <text
+            v-for="tick in chartData.ticks"
+            :key="tick.y"
+            x="8"
+            :y="tick.y + 4"
+          >
+            {{ Math.round(tick.value) }}
+          </text>
+
+          <text
+            v-for="point in chartData.points"
+            :key="point.label"
+            :x="point.x - 14"
+            y="188"
+          >
+            #{{ point.label }}
+          </text>
         </g>
 
         <path
-          d="M34 154 L62 149 L86 149 L106 126 L124 106 L144 104 L158 72 L178 64 L196 24 L214 58 L230 48 L252 36 L276 75 L300 76 L320 122 L344 151"
+          :d="chartData.path"
           fill="none"
           stroke="#5b35f1"
           stroke-linecap="round"
@@ -206,27 +289,18 @@ const reportsSummary = computed(() => {
         />
 
         <path
-          d="M34 154 L62 149 L86 149 L106 126 L124 106 L144 104 L158 72 L178 64 L196 24 L214 58 L230 48 L252 36 L276 75 L300 76 L320 122 L344 151 L344 160 L34 160 Z"
+          :d="chartData.areaPath"
           fill="url(#salesFade)"
         />
 
         <g fill="#ffffff" stroke="#5b35f1" stroke-width="3">
-          <circle cx="34" cy="154" r="4" />
-          <circle cx="62" cy="149" r="4" />
-          <circle cx="86" cy="149" r="4" />
-          <circle cx="106" cy="126" r="4" />
-          <circle cx="124" cy="106" r="4" />
-          <circle cx="144" cy="104" r="4" />
-          <circle cx="158" cy="72" r="4" />
-          <circle cx="178" cy="64" r="4" />
-          <circle cx="196" cy="24" r="5" />
-          <circle cx="214" cy="58" r="4" />
-          <circle cx="230" cy="48" r="4" />
-          <circle cx="252" cy="36" r="4" />
-          <circle cx="276" cy="75" r="4" />
-          <circle cx="300" cy="76" r="4" />
-          <circle cx="320" cy="122" r="4" />
-          <circle cx="344" cy="151" r="4" />
+          <circle
+            v-for="point in chartData.points"
+            :key="point.label"
+            :cx="point.x"
+            :cy="point.y"
+            :r="point.index === chartData.points.length - 1 ? 5 : 4"
+          />
         </g>
 
         <defs>
