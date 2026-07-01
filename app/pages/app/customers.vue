@@ -11,10 +11,10 @@ const filteredCustomers = computed(() => {
   const query = search.value.trim().toLowerCase();
 
   if (!query) {
-    return customers;
+    return customers.value;
   }
 
-  return customers.filter((customer) => {
+  return customers.value.filter((customer) => {
     return (
       customer.name.toLowerCase().includes(query) ||
       customer.phone.toLowerCase().includes(query)

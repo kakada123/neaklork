@@ -48,6 +48,25 @@ npm run prisma:migrate
 The first migration is `init_auth` and creates users, social accounts, refresh
 tokens, and auth enums.
 
+The `add_app_orders` migration adds the `orders` table and its related
+status enums used by frontend dashboard/order screens.
+
+## App Endpoints
+
+```txt
+GET /app/data
+GET /app/orders
+```
+
+`GET /app/data` returns frontend-ready dashboard payload:
+
+- `shop`
+- `rawOrders`
+- `statusOptions`
+- `reminderTemplates`
+
+`GET /app/orders` returns only `rawOrders` for table/list pages.
+
 ## Auth Endpoints
 
 All auth responses return a safe user object plus an access token and refresh

@@ -18,6 +18,22 @@ enum AuthProvider {
   TELEGRAM
 }
 
+enum OrderStatus {
+  NEW
+  CONFIRMED
+  PACKING
+  DELIVERING
+  PAID
+  PROBLEM
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  PARTIAL
+  PAYPAL
+}
+
 model User {
   id             String          @id @default(cuid())
   email          String?         @unique
@@ -31,8 +47,26 @@ model User {
   updatedAt      DateTime        @updatedAt
   socialAccounts SocialAccount[]
   refreshTokens  RefreshToken[]
+  shops          Shop[]
 
   @@map("users")
+}
+
+model Shop {
+  id          String    @id @default(cuid())
+  ownerId     String
+  name        String
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  products    Product[]
+  orders      Order[]
+
+  @@index([ownerId])
+  @@index([isActive])
+  @@map("shops")
 }
 
 model SocialAccount {
@@ -67,4 +101,43 @@ model RefreshToken {
   @@index([revokedAt])
   @@index([expiresAt])
   @@map("refresh_tokens")
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  orderNo       String        @unique
+  customerName  String
+  customerPhone String
+  productSummary String
+  amountValue   Decimal       @db.Decimal(10, 2)
+  status        OrderStatus   @default(NEW)
+  paymentStatus PaymentStatus @default(UNPAID)
+  shopId        String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  shop          Shop?         @relation(fields: [shopId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([shopId])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  sku         String?  @unique
+  description String?
+  price       Decimal  @default(0) @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+  shopId      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  shop        Shop?    @relation(fields: [shopId], references: [id], onDelete: SetNull)
+
+  @@index([name])
+  @@index([isActive])
+  @@index([shopId])
+  @@map("products")
 }

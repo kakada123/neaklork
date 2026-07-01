@@ -28,27 +28,27 @@ export interface Customer {
   totalSpent: string;
 }
 
-const statusOptions = [
-  { key: "new", label: "New", icon: "status_new" },
-  { key: "confirmed", label: "Confirmed", icon: "status_confirmed" },
-  { key: "packing", label: "Packing", icon: "status_packing" },
-  { key: "delivering", label: "Delivering", icon: "status_delivering" },
-  { key: "paid", label: "Paid", icon: "status_paid" },
-  { key: "problem", label: "Problem", icon: "status_problem" },
-];
+interface AppSeedData {
+  shop: {
+    name: string;
+    id: string;
+    owner: string;
+  };
+  rawOrders: RawOrder[];
+  statusOptions: Array<{
+    key: OrderStatus;
+    label: string;
+    icon: string;
+  }>;
+  reminderTemplates: Array<{
+    title: string;
+    message: string;
+  }>;
+}
 
-const reminderTemplates = [
-  {
-    title: "Khmer reminder",
-    message:
-      "សួស្តីបង 🙏\nOrder របស់បងនៅមិនទាន់ទូទាត់ទេ។\nបងអាចផ្ញើ slip មកខ្ញុំបានណា។\nអរគុណច្រើន ❤️",
-  },
-  {
-    title: "English reminder",
-    message:
-      "Hi 👋\n\nThis is a friendly reminder that payment for your order is due.\nPlease send it to the payment info.\nThank you! ❤️",
-  },
-];
+const statusOptions = ref<AppSeedData["statusOptions"]>([]);
+
+const reminderTemplates = ref<AppSeedData["reminderTemplates"]>([]);
 
 interface RawOrder {
   id: string;
@@ -63,86 +63,13 @@ interface RawOrder {
   paymentLabel: string;
 }
 
-const shop = {
-  name: "Kakada Shop",
-  id: "#10203",
-  owner: "Owner",
-};
+const shop = reactive({
+  name: "",
+  id: "",
+  owner: "",
+});
 
-const rawOrders: RawOrder[] = [
-  {
-    id: "1023",
-    customerName: "Sara Jones",
-    customerPhone: "02 345 6789",
-    productSummary: "Sunglasses x2",
-    amountValue: 120,
-    minutesAgo: 2,
-    status: "new",
-    statusLabel: "New",
-    paymentStatus: "unpaid",
-    paymentLabel: "Unpaid",
-  },
-  {
-    id: "1024",
-    customerName: "Bessie Baker",
-    customerPhone: "07 812 3456",
-    productSummary: "Laptop x1",
-    amountValue: 56.5,
-    minutesAgo: 15,
-    status: "confirmed",
-    statusLabel: "Easy",
-    paymentStatus: "paid",
-    paymentLabel: "Paid",
-  },
-  {
-    id: "1025",
-    customerName: "Leslie Alexander",
-    customerPhone: "06 978 6543",
-    productSummary: "Watch Set x1",
-    amountValue: 160,
-    minutesAgo: 28,
-    status: "confirmed",
-    statusLabel: "Easy",
-    paymentStatus: "unpaid",
-    paymentLabel: "Unpaid",
-  },
-  {
-    id: "1026",
-    customerName: "Guy Hawkins",
-    customerPhone: "01 234 5678",
-    productSummary: "Shoes x1",
-    amountValue: 220,
-    minutesAgo: 45,
-    status: "packing",
-    statusLabel: "Create",
-    paymentStatus: "paypal",
-    paymentLabel: "Paypal",
-  },
-  {
-    id: "1027",
-    customerName: "Dora",
-    customerPhone: "02 345 6789",
-    productSummary: "Perfume x3",
-    amountValue: 95,
-    minutesAgo: 62,
-    status: "delivering",
-    statusLabel: "Delivering",
-    paymentStatus: "paid",
-    paymentLabel: "Paid",
-  },
-  {
-    id: "1028",
-    customerName: "Chantha",
-    customerPhone: "01 234 5678",
-    productSummary: "Backpack x1",
-    amountValue: 74.25,
-    minutesAgo: 88,
-    status: "problem",
-    statusLabel: "Problem",
-    paymentStatus: "partial",
-    paymentLabel: "Partial",
-  },
-];
+const rawOrders = ref<RawOrder[]>([]);
 
 function formatMoney(amount: number) {
   return new Intl.NumberFormat("en-US", {
@@ -187,9 +114,38 @@ function groupBy<T>(items: T[], keySelector: (item: T) => string) {
   return buckets;
 }
 
+const emptyAppSeed: AppSeedData = {
+  shop: {
+    name: "",
+    id: "",
+    owner: "",
+  },
+  rawOrders: [],
+  statusOptions: [],
+  reminderTemplates: [],
+};
+
+const appSeed = useAsyncData<AppSeedData>(
+  "neaklork-app-seed",
+  () => $fetch<AppSeedData>("/api/app/data"),
+  {
+    server: false,
+    default: () => emptyAppSeed,
+  },
+);
+
+watchEffect(() => {
+  const seed = appSeed.data.value;
+
+  Object.assign(shop, seed.shop);
+  rawOrders.value = seed.rawOrders;
+  statusOptions.value = seed.statusOptions;
+  reminderTemplates.value = seed.reminderTemplates;
+});
+
 export function useNeaklorkMock() {
   const orders = computed<Order[]>(() =>
-    rawOrders.map((order) => ({
+    rawOrders.value.map((order) => ({
       id: order.id,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
@@ -205,10 +161,10 @@ export function useNeaklorkMock() {
   );
 
   const customers = computed<Customer[]>(() => {
-    const grouped = groupBy(rawOrders, (order) => order.customerPhone);
+    const grouped = groupBy(rawOrders.value, (order) => order.customerPhone);
 
     return Array.from(grouped.values()).map((items) => {
-      const firstItem = items[0];
+      const firstItem = items[0]!;
       const totalOrders = items.length;
       const totalSpent = items.reduce((sum, item) => sum + item.amountValue, 0);
 
@@ -232,12 +188,14 @@ export function useNeaklorkMock() {
       },
       {
         label: "Need payment",
-        count: orderList.filter((order) => order.paymentStatus !== "paid").length,
+        count: orderList.filter((order) => order.paymentStatus !== "paid")
+          .length,
         icon: "need_action_need_payment",
       },
       {
         label: "Need delivery",
-        count: orderList.filter((order) => order.status === "delivering").length,
+        count: orderList.filter((order) => order.status === "delivering")
+          .length,
         icon: "need_action_need_delivery",
       },
       {
@@ -251,15 +209,21 @@ export function useNeaklorkMock() {
   const statusTabs = computed(() => {
     const orderList = orders.value;
 
-    return statusOptions.map((option) => {
-      const count = orderList.filter((order) => order.status === option.key).length;
+    return statusOptions.value.map((option) => {
+      const count = orderList.filter(
+        (order) => order.status === option.key,
+      ).length;
 
-      return count > 0 ? { label: option.label, count } : { label: option.label };
+      return count > 0
+        ? { label: option.label, count }
+        : { label: option.label };
     });
   });
 
   const topProducts = computed(() => {
-    const grouped = groupBy(rawOrders, (order) => parseProductSummary(order.productSummary));
+    const grouped = groupBy(rawOrders.value, (order) =>
+      parseProductSummary(order.productSummary),
+    );
 
     return Array.from(grouped.entries())
       .map(([name, items]) => ({
@@ -276,8 +240,11 @@ export function useNeaklorkMock() {
 
   const dashboardSummary = computed(() => {
     const orderList = orders.value;
-    const sales = rawOrders.reduce((sum, order) => sum + order.amountValue, 0);
-    const unpaid = rawOrders
+    const sales = rawOrders.value.reduce(
+      (sum, order) => sum + order.amountValue,
+      0,
+    );
+    const unpaid = rawOrders.value
       .filter((order) => order.paymentStatus !== "paid")
       .reduce((sum, order) => sum + order.amountValue, 0);
 
@@ -290,7 +257,8 @@ export function useNeaklorkMock() {
       sales: formatMoney(sales),
       orders: orderList.length,
       unpaid: formatMoney(unpaid),
-      delivering: orderList.filter((order) => order.status === "delivering").length,
+      delivering: orderList.filter((order) => order.status === "delivering")
+        .length,
       recentOrder: orderList[0] ?? null,
     };
   });
