@@ -16,7 +16,7 @@ interface OrderItem {
 
 export default defineEventHandler(async (event): Promise<OrderItem[]> => {
   const accessToken = getAccessToken(event);
-  const shopId = getQuery(event).shopId;
+  const { shopId, status, paymentStatus, search } = getQuery(event);
 
   if (!accessToken) {
     throw createError({
@@ -26,12 +26,27 @@ export default defineEventHandler(async (event): Promise<OrderItem[]> => {
   }
 
   try {
-    const query =
-      typeof shopId === "string" && shopId.length > 0
-        ? `?shopId=${encodeURIComponent(shopId)}`
-        : "";
+    const query = new URLSearchParams();
 
-    return await requestApi<OrderItem[]>(event, `/orders${query}`, {
+    if (typeof shopId === "string" && shopId.length > 0) {
+      query.set("shopId", shopId);
+    }
+
+    if (typeof status === "string" && status.length > 0) {
+      query.set("status", status);
+    }
+
+    if (typeof paymentStatus === "string" && paymentStatus.length > 0) {
+      query.set("paymentStatus", paymentStatus);
+    }
+
+    if (typeof search === "string" && search.trim().length > 0) {
+      query.set("search", search.trim());
+    }
+
+    const queryString = query.size > 0 ? `?${query.toString()}` : "";
+
+    return await requestApi<OrderItem[]>(event, `/orders${queryString}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

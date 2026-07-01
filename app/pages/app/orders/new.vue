@@ -3,40 +3,156 @@ definePageMeta({
   layout: "mobile",
 });
 
+type PaymentStatus = "unpaid" | "paid" | "partial" | "paypal";
+type OrderStatus =
+  | "new"
+  | "confirmed"
+  | "packing"
+  | "delivering"
+  | "paid"
+  | "problem";
+
+interface ProductItem {
+  id: string;
+  name: string;
+  sku: string | null;
+  description: string | null;
+  price: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const quantity = ref(1);
-const paymentStatus = ref("unpaid");
-const deliveryStatus = ref("not-yet");
+const paymentStatus = ref<PaymentStatus>("unpaid");
+const orderStatus = ref<OrderStatus>("new");
 const saved = ref(false);
+const isSubmitting = ref(false);
+const errorMessage = ref("");
 
 const customerName = ref("");
 const contact = ref("");
-const socialHandle = ref("");
+const selectedProductId = ref("");
+const customProductName = ref("");
 const price = ref("");
-const note = ref("");
+
+const {
+  data: products,
+  pending: productsPending,
+} = useAsyncData<ProductItem[]>(
+  "order-form-products",
+  () => $fetch<ProductItem[]>("/api/products"),
+  {
+    server: false,
+    default: () => [],
+  },
+);
 
 const paymentOptions = [
-  { label: "Unpaid", value: "unpaid" },
-  { label: "Partial", value: "partial" },
-  { label: "Paid", value: "paid" },
+  { label: "Unpaid", value: "unpaid" as const },
+  { label: "Partial", value: "partial" as const },
+  { label: "Paid", value: "paid" as const },
 ];
 
-const deliveryOptions = [
-  { label: "Not yet", value: "not-yet", icon: "box_not_yet" },
-  { label: "Delivering", value: "delivering", icon: "truck_delivering" },
-  { label: "Delivered", value: "delivered", icon: "check_delivered" },
-  { label: "Returned", value: "returned", icon: "return_returned" },
+const orderStatusOptions = [
+  { label: "New", value: "new" as const, icon: "status_new" },
+  { label: "Confirmed", value: "confirmed" as const, icon: "status_confirmed" },
+  { label: "Packing", value: "packing" as const, icon: "status_packing" },
+  {
+    label: "Delivering",
+    value: "delivering" as const,
+    icon: "status_delivering",
+  },
+  { label: "Paid", value: "paid" as const, icon: "status_paid" },
+  { label: "Problem", value: "problem" as const, icon: "status_problem" },
 ];
+
+const selectedProduct = computed(
+  () =>
+    (products.value ?? []).find(
+      (product) => product.id === selectedProductId.value,
+    ),
+);
+
+const productLabel = computed(
+  () => selectedProduct.value?.name || customProductName.value.trim(),
+);
+
+const unitPrice = computed(() => {
+  const amount = Number(price.value.replace(/[^0-9.]/g, ""));
+  return Number.isFinite(amount) ? Math.round(amount * 100) / 100 : Number.NaN;
+});
+
+const orderTotal = computed(() =>
+  Number.isFinite(unitPrice.value)
+    ? Math.round(unitPrice.value * quantity.value * 100) / 100
+    : 0,
+);
+
+const canSubmit = computed(
+  () =>
+    customerName.value.trim().length > 0 &&
+    contact.value.trim().length > 0 &&
+    productLabel.value.length > 0 &&
+    Number.isFinite(unitPrice.value) &&
+    unitPrice.value > 0,
+);
+
+watch(selectedProduct, (product) => {
+  if (!product) {
+    return;
+  }
+
+  price.value = product.price.toFixed(2);
+});
 
 function decrementQuantity() {
   quantity.value = Math.max(1, quantity.value - 1);
 }
 
-function saveOrder() {
-  saved.value = true;
+function formatMoney(amount: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+}
 
-  window.setTimeout(() => {
-    navigateTo("/orders");
-  }, 900);
+async function saveOrder() {
+  if (!canSubmit.value || isSubmitting.value) {
+    return;
+  }
+
+  errorMessage.value = "";
+  isSubmitting.value = true;
+
+  try {
+    await $fetch("/api/orders", {
+      method: "POST",
+      body: {
+        customerName: customerName.value.trim(),
+        customerPhone: contact.value.trim(),
+        productSummary: `${productLabel.value} x${quantity.value}`,
+        amountValue: orderTotal.value,
+        status: orderStatus.value,
+        paymentStatus: paymentStatus.value,
+      },
+    });
+
+    await Promise.all([
+      refreshNuxtData("neaklork-app-seed"),
+      refreshNuxtData("orders-list"),
+    ]);
+
+    saved.value = true;
+
+    window.setTimeout(() => {
+      navigateTo("/orders");
+    }, 900);
+  } catch (error) {
+    errorMessage.value = getAuthErrorMessage(error);
+  } finally {
+    isSubmitting.value = false;
+  }
 }
 </script>
 
@@ -61,6 +177,7 @@ function saveOrder() {
           type="text"
           placeholder="Customer name"
           autocomplete="name"
+          required
         />
 
         <input
@@ -69,13 +186,7 @@ function saveOrder() {
           type="text"
           placeholder="Phone / Telegram"
           autocomplete="tel"
-        />
-
-        <input
-          v-model="socialHandle"
-          class="min-h-[48px] w-full rounded-[13px] border border-[#dce1ea] bg-white px-[14px] text-[14px] font-medium leading-none tracking-[-0.2px] text-[var(--text)] outline-none placeholder:text-[#818898]"
-          type="text"
-          placeholder="HQ-912-34-678 or Instagram"
+          required
         />
       </div>
     </section>
@@ -97,14 +208,45 @@ function saveOrder() {
         Product
       </label>
 
-      <button
+      <select
         id="product-selector"
-        class="flex min-h-[48px] w-full items-center justify-between rounded-[13px] border border-[#dce1ea] bg-white px-[14px] text-[14px] font-medium leading-none tracking-[-0.2px] text-[#70778a]"
-        type="button"
+        v-model="selectedProductId"
+        class="min-h-[48px] w-full rounded-[13px] border border-[#dce1ea] bg-white px-[14px] text-[14px] font-medium leading-none tracking-[-0.2px] text-[var(--text)] outline-none"
+        :disabled="productsPending"
       >
-        Select product
-        <AppIcon name="chevron_right" :size="14" />
-      </button>
+        <option value="">
+          {{ productsPending ? "Loading products..." : "Select product" }}
+        </option>
+
+        <option
+          v-for="product in products"
+          :key="product.id"
+          :value="product.id"
+        >
+          {{ product.name }} - {{ formatMoney(product.price) }}
+        </option>
+      </select>
+
+      <input
+        v-if="!selectedProductId"
+        v-model.trim="customProductName"
+        class="mt-[12px] min-h-[48px] w-full rounded-[13px] border border-[#dce1ea] bg-white px-[14px] text-[14px] font-medium leading-none tracking-[-0.2px] text-[var(--text)] outline-none placeholder:text-[#818898]"
+        type="text"
+        autocomplete="off"
+        placeholder="Or type a custom product"
+        maxlength="120"
+      />
+
+      <p
+        v-if="!productsPending && products.length === 0"
+        class="m-0 mt-[10px] text-[12px] font-semibold leading-tight text-[var(--muted)]"
+      >
+        Add reusable products from
+        <NuxtLink class="font-black text-[var(--purple)]" to="/products">
+          Products
+        </NuxtLink>
+        .
+      </p>
 
       <div
         class="mt-[16px] grid grid-cols-[1.05fr_0.95fr] gap-[12px] max-[374px]:grid-cols-1"
@@ -159,9 +301,16 @@ function saveOrder() {
             type="text"
             inputmode="decimal"
             placeholder="$ 0.00"
+            required
           />
         </div>
       </div>
+
+      <p
+        class="m-0 mt-[12px] text-right text-[13px] font-bold leading-none text-[var(--muted)]"
+      >
+        Total: {{ formatMoney(orderTotal) }}
+      </p>
     </section>
 
     <!-- Payment Status -->
@@ -201,28 +350,28 @@ function saveOrder() {
       </div>
     </section>
 
-    <!-- Delivery Status -->
+    <!-- Order Status -->
     <section
       class="rounded-[26px] border border-white/90 bg-[var(--surface)] p-4 shadow-[var(--card-shadow)] backdrop-blur-[20px]"
     >
       <h2
         class="m-0 mb-[14px] text-[16px] font-bold leading-tight tracking-[-0.35px] text-[var(--text)]"
       >
-        Delivery Status
+        Order Status
       </h2>
 
-      <div class="grid grid-cols-4 gap-[12px] max-[374px]:grid-cols-2">
+      <div class="grid grid-cols-3 gap-[12px] max-[374px]:grid-cols-2">
         <button
-          v-for="option in deliveryOptions"
+          v-for="option in orderStatusOptions"
           :key="option.value"
           class="flex min-w-0 flex-col items-center justify-center gap-[8px] rounded-[14px] px-[6px] py-[10px] text-center text-[12px] font-bold leading-tight tracking-[-0.15px]"
           :class="
-            deliveryStatus === option.value
+            orderStatus === option.value
               ? 'bg-[#f0ecff] text-[var(--purple-dark)]'
               : 'bg-transparent text-[var(--muted)]'
           "
           type="button"
-          @click="deliveryStatus = option.value"
+          @click="orderStatus = option.value"
         >
           <AppIcon :name="option.icon" :size="24" />
 
@@ -233,29 +382,24 @@ function saveOrder() {
       </div>
     </section>
 
-    <!-- Note + Save -->
+    <!-- Save -->
     <section
       class="rounded-[26px] border border-white/90 bg-[var(--surface)] p-4 shadow-[var(--card-shadow)] backdrop-blur-[20px]"
     >
-      <label
-        class="mb-[8px] block text-[14px] font-bold leading-none tracking-[-0.25px] text-[var(--text)]"
-        for="order-note"
+      <p
+        v-if="errorMessage"
+        class="m-0 rounded-[18px] bg-[#fff0f3] px-[14px] py-[11px] text-[13px] font-bold leading-snug text-[var(--red)]"
       >
-        Note <span class="text-[var(--muted)]">(optional)</span>
-      </label>
-
-      <textarea
-        id="order-note"
-        v-model="note"
-        class="min-h-[78px] w-full resize-y rounded-[13px] border border-[#dce1ea] bg-white px-[14px] pt-[14px] text-[14px] font-medium leading-tight tracking-[-0.2px] text-[var(--text)] outline-none placeholder:text-[#818898]"
-        placeholder="Add a note..."
-      />
+        {{ errorMessage }}
+      </p>
 
       <button
-        class="mt-[16px] inline-flex min-h-[52px] w-full items-center justify-center gap-[8px] rounded-2xl bg-[linear-gradient(135deg,var(--purple),var(--purple-dark))] text-[15px] font-extrabold leading-none tracking-[-0.25px] text-white shadow-[0_16px_28px_rgba(108,78,247,0.24)]"
+        class="inline-flex min-h-[52px] w-full items-center justify-center gap-[8px] rounded-2xl bg-[linear-gradient(135deg,var(--purple),var(--purple-dark))] text-[15px] font-extrabold leading-none tracking-[-0.25px] text-white shadow-[0_16px_28px_rgba(108,78,247,0.24)] disabled:cursor-not-allowed disabled:opacity-65"
+        :class="{ 'mt-[16px]': errorMessage }"
         type="submit"
+        :disabled="!canSubmit || isSubmitting"
       >
-        Save Order
+        {{ isSubmitting ? "Saving..." : "Save Order" }}
       </button>
     </section>
 

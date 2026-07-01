@@ -5,9 +5,28 @@ definePageMeta({
 
 const route = useRoute();
 const { orders } = useNeaklorkMock();
+const statusError = ref("");
+const isUpdatingStatus = ref(false);
+
+const emptyOrder = {
+  id: "----",
+  customerName: "Unknown customer",
+  customerPhone: "",
+  customerInitials: "",
+  productSummary: "No items",
+  amount: "$0.00",
+  timeAgo: "Just now",
+  status: "new" as const,
+  statusLabel: "New",
+  paymentStatus: "unpaid" as const,
+  paymentLabel: "Unpaid",
+};
 
 const order = computed(
-  () => orders.find((item) => item.id === route.params.id) ?? orders[0],
+  () =>
+    orders.value.find((item) => item.id === route.params.id) ??
+    orders.value[0] ??
+    emptyOrder,
 );
 
 const items = computed(() => {
@@ -58,6 +77,30 @@ const paymentTone = computed(() => {
 
   return "orange";
 });
+
+async function updateOrderStatus(status: string) {
+  if (isUpdatingStatus.value || order.value.id === "----") {
+    return;
+  }
+
+  statusError.value = "";
+  isUpdatingStatus.value = true;
+
+  try {
+    await $fetch(`/api/orders/${order.value.id}/status`, {
+      method: "PATCH",
+      body: {
+        status,
+      },
+    });
+
+    await refreshNuxtData("neaklork-app-seed");
+  } catch (error) {
+    statusError.value = getAuthErrorMessage(error);
+  } finally {
+    isUpdatingStatus.value = false;
+  }
+}
 </script>
 
 <template>
@@ -219,6 +262,13 @@ const paymentTone = computed(() => {
     </h2>
 
     <section class="grid grid-cols-2 gap-[12px]">
+      <p
+        v-if="statusError"
+        class="col-span-full m-0 rounded-[18px] bg-[#fff0f3] px-[14px] py-[11px] text-[13px] font-bold leading-snug text-[var(--red)]"
+      >
+        {{ statusError }}
+      </p>
+
       <NuxtLink
         to="/reminders/payment"
         class="inline-flex min-h-[48px] items-center justify-center gap-[8px] rounded-[14px] bg-[#f3efff] text-[14px] font-bold leading-none tracking-[-0.25px] text-[var(--purple-dark)]"
@@ -238,9 +288,11 @@ const paymentTone = computed(() => {
       <button
         class="col-span-full inline-flex min-h-[48px] items-center justify-center gap-[8px] rounded-[14px] border border-[rgba(244,63,94,0.12)] bg-[#fff1f3] text-[14px] font-bold leading-none tracking-[-0.25px] text-[#ef2f43]"
         type="button"
+        :disabled="isUpdatingStatus"
+        @click="updateOrderStatus('problem')"
       >
         <AppIcon name="alert_triangle" :size="18" />
-        Mark as Problem
+        {{ isUpdatingStatus ? "Updating..." : "Mark as Problem" }}
       </button>
     </section>
   </div>

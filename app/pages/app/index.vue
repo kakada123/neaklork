@@ -7,9 +7,13 @@ definePageMeta({
 const { shop, actionItems, dashboardSummary } = useNeaklorkMock();
 const { user } = useAuth();
 
-const displayShopName = computed(() => user.value?.name || shop.name);
+const displayShopName = computed(() => shop.name || user.value?.name || "Shop");
 const displayShopId = computed(() =>
-  user.value?.id ? `#${user.value.id.slice(-6).toUpperCase()}` : shop.id,
+  shop.id
+    ? `#${shop.id.slice(-6).toUpperCase()}`
+    : user.value?.id
+      ? `#${user.value.id.slice(-6).toUpperCase()}`
+      : "",
 );
 const profilePath = computed(() => `/profile/${user.value?.id ?? "me"}`);
 const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");

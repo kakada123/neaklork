@@ -13,6 +13,22 @@ export type OrderStatus =
   | 'paid'
   | 'problem';
 
+export const orderStatusValues: OrderStatus[] = [
+  'new',
+  'confirmed',
+  'packing',
+  'delivering',
+  'paid',
+  'problem',
+];
+
+export const paymentStatusValues: PaymentStatus[] = [
+  'unpaid',
+  'paid',
+  'partial',
+  'paypal',
+];
+
 export interface RawOrder {
   id: string;
   customerName: string;
@@ -48,6 +64,15 @@ const dbToApiOrderStatus: Record<DbOrderStatus, OrderStatus> = {
   PROBLEM: 'problem',
 };
 
+const apiToDbOrderStatus: Record<OrderStatus, DbOrderStatus> = {
+  new: DbOrderStatus.NEW,
+  confirmed: DbOrderStatus.CONFIRMED,
+  packing: DbOrderStatus.PACKING,
+  delivering: DbOrderStatus.DELIVERING,
+  paid: DbOrderStatus.PAID,
+  problem: DbOrderStatus.PROBLEM,
+};
+
 const orderStatusLabels: Record<OrderStatus, string> = {
   new: 'New',
   confirmed: 'Confirmed',
@@ -62,6 +87,13 @@ const dbToApiPaymentStatus: Record<DbPaymentStatus, PaymentStatus> = {
   PAID: 'paid',
   PARTIAL: 'partial',
   PAYPAL: 'paypal',
+};
+
+const apiToDbPaymentStatus: Record<PaymentStatus, DbPaymentStatus> = {
+  unpaid: DbPaymentStatus.UNPAID,
+  paid: DbPaymentStatus.PAID,
+  partial: DbPaymentStatus.PARTIAL,
+  paypal: DbPaymentStatus.PAYPAL,
 };
 
 const paymentStatusLabels: Record<PaymentStatus, string> = {
@@ -91,4 +123,12 @@ export function toRawOrder(order: DbOrder): RawOrder {
     paymentStatus,
     paymentLabel: paymentStatusLabels[paymentStatus],
   };
+}
+
+export function toDbOrderStatus(status: OrderStatus): DbOrderStatus {
+  return apiToDbOrderStatus[status];
+}
+
+export function toDbPaymentStatus(status: PaymentStatus): DbPaymentStatus {
+  return apiToDbPaymentStatus[status];
 }

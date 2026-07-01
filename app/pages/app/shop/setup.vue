@@ -5,20 +5,21 @@ definePageMeta({
 });
 
 useHead({
-  title: "Sign Up | NeakLork",
+  title: "Shop Setup | NeakLork",
 });
 
 const route = useRoute();
-const { signup } = useAuth();
+const { user } = useAuth();
 const { createShop } = useShopFlow();
 
 const form = reactive({
-  shopName: "",
-  email: "",
-  password: "",
+  name: "",
+  description: "",
 });
 const isSubmitting = ref(false);
 const errorMessage = ref("");
+
+const canSubmit = computed(() => form.name.trim().length >= 2);
 
 function getRedirectTarget() {
   const redirect = route.query.redirect;
@@ -27,7 +28,11 @@ function getRedirectTarget() {
     return "/";
   }
 
-  if (redirect === "/login" || redirect === "/signup") {
+  if (
+    redirect === "/login" ||
+    redirect === "/signup" ||
+    redirect === "/shop/setup"
+  ) {
     return "/";
   }
 
@@ -35,37 +40,27 @@ function getRedirectTarget() {
 }
 
 async function handleSubmit() {
+  if (!user.value || !canSubmit.value || isSubmitting.value) {
+    return;
+  }
+
   errorMessage.value = "";
   isSubmitting.value = true;
 
   try {
-    const createdUser = await signup({
-      email: form.email,
-      password: form.password,
-    });
-
-    try {
-      await createShop({ name: form.shopName }, createdUser.id);
-    } catch {
-      await navigateTo({
-        path: "/shop/setup",
-        query: {
-          redirect: getRedirectTarget(),
-        },
-      });
-      return;
-    }
-
+    await createShop(
+      {
+        name: form.name.trim(),
+        description: form.description.trim() || undefined,
+      },
+      user.value.id,
+    );
     await navigateTo(getRedirectTarget());
   } catch (error) {
     errorMessage.value = getAuthErrorMessage(error);
   } finally {
     isSubmitting.value = false;
   }
-}
-
-async function handleSocialSuccess() {
-  await navigateTo(getRedirectTarget());
 }
 </script>
 
@@ -90,13 +85,13 @@ async function handleSocialSuccess() {
             <p
               class="m-0 text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--muted)]"
             >
-              Start selling
+              Shop setup
             </p>
 
             <h1
               class="m-0 mt-[5px] text-[30px] font-black leading-none tracking-[-1px] text-[var(--purple)]"
             >
-              Create Account
+              Create Shop
             </h1>
           </div>
         </div>
@@ -113,7 +108,7 @@ async function handleSocialSuccess() {
             </span>
 
             <input
-              v-model.trim="form.shopName"
+              v-model.trim="form.name"
               class="h-[52px] w-full rounded-[20px] border border-[var(--line)] bg-white/80 px-[16px] text-[15px] font-semibold tracking-[-0.2px] text-[var(--text)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--purple)] focus:ring-4 focus:ring-[#4b25e8]/10"
               type="text"
               autocomplete="organization"
@@ -128,35 +123,15 @@ async function handleSocialSuccess() {
             <span
               class="mb-[8px] block px-1 text-[13px] font-bold leading-none text-[var(--text)]"
             >
-              Email
+              Description
             </span>
 
-            <input
-              v-model.trim="form.email"
-              class="h-[52px] w-full rounded-[20px] border border-[var(--line)] bg-white/80 px-[16px] text-[15px] font-semibold tracking-[-0.2px] text-[var(--text)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--purple)] focus:ring-4 focus:ring-[#4b25e8]/10"
-              type="email"
-              autocomplete="email"
-              inputmode="email"
-              placeholder="seller@example.com"
-              required
-            />
-          </label>
-
-          <label class="block">
-            <span
-              class="mb-[8px] block px-1 text-[13px] font-bold leading-none text-[var(--text)]"
-            >
-              Password
-            </span>
-
-            <input
-              v-model="form.password"
-              class="h-[52px] w-full rounded-[20px] border border-[var(--line)] bg-white/80 px-[16px] text-[15px] font-semibold tracking-[-0.2px] text-[var(--text)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--purple)] focus:ring-4 focus:ring-[#4b25e8]/10"
-              type="password"
-              autocomplete="new-password"
-              placeholder="At least 8 characters"
-              minlength="8"
-              required
+            <textarea
+              v-model.trim="form.description"
+              class="min-h-[92px] w-full resize-none rounded-[20px] border border-[var(--line)] bg-white/80 px-[16px] py-[14px] text-[15px] font-semibold tracking-[-0.2px] text-[var(--text)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--purple)] focus:ring-4 focus:ring-[#4b25e8]/10"
+              autocomplete="off"
+              placeholder="Online clothing, cosmetics, or daily goods"
+              maxlength="500"
             />
           </label>
 
@@ -170,25 +145,11 @@ async function handleSocialSuccess() {
           <button
             class="mt-[4px] flex h-[54px] w-full items-center justify-center rounded-[22px] bg-[linear-gradient(135deg,#7048ff_0%,#5b31ef_52%,#4f22e8_100%)] text-[15px] font-black tracking-[-0.2px] text-white shadow-[var(--purple-shadow)] transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-65"
             type="submit"
-            :disabled="isSubmitting"
+            :disabled="!canSubmit || isSubmitting"
           >
-            {{ isSubmitting ? "Creating account..." : "Sign up" }}
+            {{ isSubmitting ? "Creating shop..." : "Continue" }}
           </button>
         </form>
-
-        <SocialAuthButtons
-          @success="handleSocialSuccess"
-          @error="errorMessage = $event"
-        />
-
-        <p
-          class="m-0 mt-[18px] text-center text-[13px] font-semibold leading-tight text-[var(--muted)]"
-        >
-          Already have an account?
-          <NuxtLink class="font-black text-[var(--purple)]" to="/login">
-            Login
-          </NuxtLink>
-        </p>
       </div>
     </section>
   </div>

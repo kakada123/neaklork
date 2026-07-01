@@ -19,7 +19,7 @@ const showLogoutConfirm = ref(false);
 const profilePath = computed(() => `/profile/${user.value?.id ?? "me"}`);
 const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
 
-const displayShopName = computed(() => user.value?.name || shop.name);
+const displayShopName = computed(() => shop.name || user.value?.name || "Shop");
 const displayShopOwner = computed(() => user.value?.email || shop.owner);
 
 const menuItems = computed<MenuItem[]>(() => [
@@ -49,9 +49,9 @@ const menuItems = computed<MenuItem[]>(() => [
   },
   {
     label: "Products",
-    to: "/orders/new",
+    to: "/products",
     icon: "products_box",
-    match: (path) => path === "/orders/new",
+    match: (path) => path.startsWith("/products"),
   },
   {
     label: "Reports",

@@ -45,7 +45,7 @@ export class AppDataService {
   ) {}
 
   async getOrders(ownerId: string, shopId?: string): Promise<RawOrder[]> {
-    return await this.ordersService.list(ownerId, shopId);
+    return await this.ordersService.list(ownerId, { shopId });
   }
 
   async getSeedData(ownerId: string, shopId?: string): Promise<AppSeedData> {

@@ -1,4 +1,4 @@
-import { createError, getQuery } from "h3";
+import { createError, getQuery, readBody } from "h3";
 import { getAccessToken, requestApi } from "../../utils/auth";
 
 type PaymentStatus = "unpaid" | "paid" | "partial" | "paypal";
@@ -10,7 +10,16 @@ type OrderStatus =
   | "paid"
   | "problem";
 
-interface RawOrder {
+interface OrderCreateBody {
+  customerName: string;
+  customerPhone: string;
+  productSummary: string;
+  amountValue: number;
+  status?: OrderStatus;
+  paymentStatus?: PaymentStatus;
+}
+
+interface OrderItem {
   id: string;
   customerName: string;
   customerPhone: string;
@@ -23,9 +32,9 @@ interface RawOrder {
   paymentLabel: string;
 }
 
-export default defineEventHandler(async (event): Promise<RawOrder[]> => {
+export default defineEventHandler(async (event): Promise<OrderItem> => {
   const accessToken = getAccessToken(event);
-  const { shopId, status, paymentStatus, search } = getQuery(event);
+  const shopId = getQuery(event).shopId;
 
   if (!accessToken) {
     throw createError({
@@ -35,27 +44,15 @@ export default defineEventHandler(async (event): Promise<RawOrder[]> => {
   }
 
   try {
-    const query = new URLSearchParams();
+    const body = await readBody<OrderCreateBody>(event);
+    const query =
+      typeof shopId === "string" && shopId.length > 0
+        ? `?shopId=${encodeURIComponent(shopId)}`
+        : "";
 
-    if (typeof shopId === "string" && shopId.length > 0) {
-      query.set("shopId", shopId);
-    }
-
-    if (typeof status === "string" && status.length > 0) {
-      query.set("status", status);
-    }
-
-    if (typeof paymentStatus === "string" && paymentStatus.length > 0) {
-      query.set("paymentStatus", paymentStatus);
-    }
-
-    if (typeof search === "string" && search.trim().length > 0) {
-      query.set("search", search.trim());
-    }
-
-    const queryString = query.size > 0 ? `?${query.toString()}` : "";
-
-    return await requestApi<RawOrder[]>(event, `/orders${queryString}`, {
+    return await requestApi<OrderItem>(event, `/orders${query}`, {
+      method: "POST",
+      body,
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -65,7 +62,7 @@ export default defineEventHandler(async (event): Promise<RawOrder[]> => {
 
     throw createError({
       statusCode,
-      statusMessage: "Failed to load orders",
+      statusMessage: "Failed to create order",
     });
   }
 });

@@ -46,7 +46,16 @@ interface AppSeedData {
   }>;
 }
 
-const statusOptions = ref<AppSeedData["statusOptions"]>([]);
+const defaultStatusOptions: AppSeedData["statusOptions"] = [
+  { key: "new", label: "New", icon: "status_new" },
+  { key: "confirmed", label: "Confirmed", icon: "status_confirmed" },
+  { key: "packing", label: "Packing", icon: "status_packing" },
+  { key: "delivering", label: "Delivering", icon: "status_delivering" },
+  { key: "paid", label: "Paid", icon: "status_paid" },
+  { key: "problem", label: "Problem", icon: "status_problem" },
+];
+
+const statusOptions = ref<AppSeedData["statusOptions"]>(defaultStatusOptions);
 
 const reminderTemplates = ref<AppSeedData["reminderTemplates"]>([]);
 
@@ -121,7 +130,7 @@ const emptyAppSeed: AppSeedData = {
     owner: "",
   },
   rawOrders: [],
-  statusOptions: [],
+  statusOptions: defaultStatusOptions,
   reminderTemplates: [],
 };
 
@@ -139,7 +148,9 @@ watchEffect(() => {
 
   Object.assign(shop, seed.shop);
   rawOrders.value = seed.rawOrders;
-  statusOptions.value = seed.statusOptions;
+  statusOptions.value = seed.statusOptions.length
+    ? seed.statusOptions
+    : defaultStatusOptions;
   reminderTemplates.value = seed.reminderTemplates;
 });
 
