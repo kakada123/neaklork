@@ -1,5 +1,11 @@
 import { createHash, randomBytes } from "node:crypto";
-import { createError, getHeader, sendRedirect, setCookie, type H3Event } from "h3";
+import {
+  createError,
+  getHeader,
+  sendRedirect,
+  setCookie,
+  type H3Event,
+} from "h3";
 
 const STATE_COOKIE = "neaklork_telegram_oidc_state";
 const VERIFIER_COOKIE = "neaklork_telegram_oidc_verifier";
@@ -19,7 +25,10 @@ function getRequestOrigin(event: H3Event) {
     getHeader(event, "x-forwarded-host") ?? getHeader(event, "host");
 
   if (!hostHeader) {
-    throw createError({ statusCode: 400, statusMessage: "Missing host header" });
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Missing host header",
+    });
   }
 
   const proto = protoHeader?.split(",")[0]?.trim() || "http";

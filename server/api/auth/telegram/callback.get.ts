@@ -23,7 +23,10 @@ function getRequestOrigin(event: H3Event) {
     getHeader(event, "x-forwarded-host") ?? getHeader(event, "host");
 
   if (!hostHeader) {
-    throw createError({ statusCode: 400, statusMessage: "Missing host header" });
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Missing host header",
+    });
   }
 
   const proto = protoHeader?.split(",")[0]?.trim() || "http";
@@ -53,21 +56,31 @@ export default defineEventHandler(async (event) => {
     return await sendRedirect(event, "/login?telegram=cancelled", 302);
   }
 
-  if (!code || !state || !expectedState || state !== expectedState || !codeVerifier) {
+  if (
+    !code ||
+    !state ||
+    !expectedState ||
+    state !== expectedState ||
+    !codeVerifier
+  ) {
     clearFlowCookies(event);
     clearAuthCookies(event);
     return await sendRedirect(event, "/login?telegram=failed", 302);
   }
 
   try {
-    const auth = await requestApi<AuthTokenResponse>(event, "/auth/telegram/code", {
-      method: "POST",
-      body: {
-        code,
-        codeVerifier,
-        redirectUri,
+    const auth = await requestApi<AuthTokenResponse>(
+      event,
+      "/auth/telegram/code",
+      {
+        method: "POST",
+        body: {
+          code,
+          codeVerifier,
+          redirectUri,
+        },
       },
-    });
+    );
 
     setAuthCookies(event, auth);
     clearFlowCookies(event);

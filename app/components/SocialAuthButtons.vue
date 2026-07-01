@@ -54,7 +54,8 @@ const emit = defineEmits<{
 }>();
 
 const config = useRuntimeConfig();
-const { loginWithGoogle, loginWithFacebook, startTelegramCodeLogin } = useAuth();
+const { loginWithGoogle, loginWithFacebook, startTelegramCodeLogin } =
+  useAuth();
 
 const googleButtonRef = ref<HTMLElement | null>(null);
 const activeProvider = ref<"google" | "facebook" | "telegram" | null>(null);

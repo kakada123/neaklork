@@ -497,8 +497,11 @@ export class AuthService {
     };
   }
 
-  private async verifyTelegramIdToken(idToken: string): Promise<SocialUserInput> {
-    const clientId = this.configService.getOrThrow<string>('TELEGRAM_CLIENT_ID');
+  private async verifyTelegramIdToken(
+    idToken: string,
+  ): Promise<SocialUserInput> {
+    const clientId =
+      this.configService.getOrThrow<string>('TELEGRAM_CLIENT_ID');
 
     try {
       const { payload } = await jwtVerify(idToken, TELEGRAM_OIDC_JWKS, {
@@ -509,7 +512,8 @@ export class AuthService {
       const providerUserId = payload.id ?? payload.sub;
 
       if (
-        (typeof providerUserId !== 'string' && typeof providerUserId !== 'number') ||
+        (typeof providerUserId !== 'string' &&
+          typeof providerUserId !== 'number') ||
         !providerUserId
       ) {
         throw new UnauthorizedException('Invalid Telegram login token');
@@ -533,7 +537,8 @@ export class AuthService {
   private async exchangeTelegramCodeForIdToken(
     dto: TelegramCodeAuthDto,
   ): Promise<string> {
-    const clientId = this.configService.getOrThrow<string>('TELEGRAM_CLIENT_ID');
+    const clientId =
+      this.configService.getOrThrow<string>('TELEGRAM_CLIENT_ID');
     const clientSecret = this.configService.getOrThrow<string>(
       'TELEGRAM_CLIENT_SECRET',
     );
