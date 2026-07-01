@@ -127,6 +127,15 @@ export function useAuth() {
     return response.user;
   }
 
+  async function startTelegramCodeLogin() {
+    if (import.meta.client) {
+      window.location.assign("/api/auth/telegram/start");
+      return;
+    }
+
+    await navigateTo("/api/auth/telegram/start", { external: true });
+  }
+
   async function logout() {
     await $fetch("/api/auth/logout", { method: "POST" }).catch(() => null);
 
@@ -143,6 +152,7 @@ export function useAuth() {
     loginWithGoogle,
     loginWithFacebook,
     loginWithTelegram,
+    startTelegramCodeLogin,
     logout,
   };
 }

@@ -8,6 +8,7 @@ import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TelegramAuthDto } from './dto/telegram-auth.dto';
+import { TelegramCodeAuthDto } from './dto/telegram-code-auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from './guards/optional-jwt-auth.guard';
 import { AuthService } from './auth.service';
@@ -72,6 +73,11 @@ export class AuthController {
   @Post('telegram')
   telegram(@Body() dto: TelegramAuthDto, @Req() request: Request) {
     return this.authService.telegram(dto, this.getRequestContext(request));
+  }
+
+  @Post('telegram/code')
+  telegramCode(@Body() dto: TelegramCodeAuthDto, @Req() request: Request) {
+    return this.authService.telegramCode(dto, this.getRequestContext(request));
   }
 
   private getRequestContext(request: Request): AuthRequestContext {

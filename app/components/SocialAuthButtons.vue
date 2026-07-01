@@ -3,11 +3,6 @@ interface GoogleCredentialResponse {
   credential?: string;
 }
 
-interface TelegramLoginResponse {
-  id_token?: string;
-  error?: string;
-}
-
 interface FacebookLoginResponse {
   authResponse?: {
     accessToken?: string;
@@ -50,7 +45,6 @@ declare global {
         };
       };
     };
-    onNeaklorkTelegramAuth?: (payload: TelegramLoginResponse) => void;
   }
 }
 
@@ -60,10 +54,9 @@ const emit = defineEmits<{
 }>();
 
 const config = useRuntimeConfig();
-const { loginWithGoogle, loginWithFacebook, loginWithTelegram } = useAuth();
+const { loginWithGoogle, loginWithFacebook, startTelegramCodeLogin } = useAuth();
 
 const googleButtonRef = ref<HTMLElement | null>(null);
-const telegramWidgetRef = ref<HTMLElement | null>(null);
 const activeProvider = ref<"google" | "facebook" | "telegram" | null>(null);
 const setupError = ref("");
 
@@ -203,44 +196,20 @@ async function handleFacebookLogin() {
   });
 }
 
-function setupTelegramWidget() {
-  if (!hasTelegram.value || !telegramWidgetRef.value) {
-    return;
+async function handleTelegramLogin() {
+  setupError.value = "";
+  activeProvider.value = "telegram";
+
+  try {
+    await startTelegramCodeLogin();
+  } catch (error) {
+    emit("error", getAuthErrorMessage(error));
+    activeProvider.value = null;
   }
-
-  window.onNeaklorkTelegramAuth = (payload) => {
-    if (payload.error) {
-      emit("error", payload.error);
-      return;
-    }
-
-    if (!payload.id_token) {
-      emit("error", "Telegram did not return an ID token");
-      return;
-    }
-
-    void runSocialAuth("telegram", () => loginWithTelegram(payload.id_token!));
-  };
-
-  telegramWidgetRef.value.innerHTML = "";
-
-  const script = document.createElement("script");
-  script.src = "https://oauth.telegram.org/js/telegram-login.js?5";
-  script.async = true;
-  script.setAttribute("data-client-id", telegramClientId.value);
-  script.setAttribute("data-request-access", "write");
-  script.setAttribute("data-onauth", "onNeaklorkTelegramAuth(data)");
-
-  telegramWidgetRef.value.appendChild(script);
 }
 
 onMounted(() => {
   void setupGoogleButton();
-  setupTelegramWidget();
-});
-
-onBeforeUnmount(() => {
-  delete window.onNeaklorkTelegramAuth;
 });
 </script>
 
@@ -289,12 +258,20 @@ onBeforeUnmount(() => {
         }}
       </button>
 
-      <div
+      <button
         v-if="hasTelegram"
-        class="grid min-h-[46px] place-items-center rounded-[20px] border border-[#229ed9]/15 bg-white/80 py-[6px] shadow-[0_8px_18px_rgba(34,158,217,0.08)]"
+        class="flex h-[46px] w-full items-center justify-center gap-[10px] rounded-[20px] border border-[#229ed9]/20 bg-white/80 text-[14px] font-black tracking-[-0.2px] text-[#229ed9] shadow-[0_8px_18px_rgba(34,158,217,0.08)] transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+        type="button"
+        :disabled="activeProvider !== null"
+        @click="handleTelegramLogin"
       >
-        <div ref="telegramWidgetRef" />
-      </div>
+        <i class="pi pi-telegram text-[18px]" aria-hidden="true" />
+        {{
+          activeProvider === "telegram"
+            ? "Connecting..."
+            : "Continue with Telegram"
+        }}
+      </button>
 
       <button
         v-else

@@ -27,6 +27,7 @@ GOOGLE_CLIENT_ID=
 FACEBOOK_APP_ID=
 FACEBOOK_APP_SECRET=
 TELEGRAM_CLIENT_ID=
+TELEGRAM_CLIENT_SECRET=
 NUXT_WEB_ORIGIN=http://localhost:3000
 PORT=3001
 ```
@@ -63,6 +64,7 @@ GET  /auth/me
 POST /auth/google
 POST /auth/facebook
 POST /auth/telegram
+POST /auth/telegram/code
 ```
 
 `POST /auth/signup` is an alias for email/password registration. If the email

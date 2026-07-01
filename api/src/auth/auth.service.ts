@@ -16,6 +16,7 @@ import { SocialUserInput, UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TelegramAuthDto } from './dto/telegram-auth.dto';
+import { TelegramCodeAuthDto } from './dto/telegram-code-auth.dto';
 import { AuthRequestContext } from './types/auth-request-context';
 import { AuthResponse } from './types/auth-response';
 import {
@@ -59,6 +60,10 @@ interface FacebookMeResponse {
       url?: string;
     };
   };
+}
+
+interface TelegramTokenResponse {
+  id_token?: string;
 }
 
 interface TokenPair extends AuthResponse {
@@ -229,6 +234,18 @@ export class AuthService {
     const profile = dto.idToken
       ? await this.verifyTelegramIdToken(dto.idToken)
       : this.verifyTelegramPayload(dto);
+    const user = await this.usersService.findOrCreateSocialUser(profile);
+    this.assertActiveUser(user);
+
+    return this.toAuthResponse(await this.createTokenPair(user, context));
+  }
+
+  async telegramCode(
+    dto: TelegramCodeAuthDto,
+    context: AuthRequestContext,
+  ): Promise<AuthResponse> {
+    const idToken = await this.exchangeTelegramCodeForIdToken(dto);
+    const profile = await this.verifyTelegramIdToken(idToken);
     const user = await this.usersService.findOrCreateSocialUser(profile);
     this.assertActiveUser(user);
 
@@ -511,6 +528,46 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('Invalid Telegram login token');
     }
+  }
+
+  private async exchangeTelegramCodeForIdToken(
+    dto: TelegramCodeAuthDto,
+  ): Promise<string> {
+    const clientId = this.configService.getOrThrow<string>('TELEGRAM_CLIENT_ID');
+    const clientSecret = this.configService.getOrThrow<string>(
+      'TELEGRAM_CLIENT_SECRET',
+    );
+    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
+      'base64',
+    );
+    const body = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: dto.code,
+      redirect_uri: dto.redirectUri,
+      client_id: clientId,
+      code_verifier: dto.codeVerifier,
+    });
+
+    const response = await fetch('https://oauth.telegram.org/token', {
+      method: 'POST',
+      headers: {
+        authorization: `Basic ${credentials}`,
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      throw new UnauthorizedException('Invalid Telegram authorization code');
+    }
+
+    const tokens = (await response.json()) as TelegramTokenResponse;
+
+    if (!tokens.id_token) {
+      throw new UnauthorizedException('Telegram did not return an ID token');
+    }
+
+    return tokens.id_token;
   }
 
   private buildTelegramDataCheckString(dto: TelegramAuthDto) {

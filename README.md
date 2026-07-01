@@ -112,3 +112,8 @@ NUXT_PUBLIC_TELEGRAM_CLIENT_ID=
 
 The public provider keys enable the Google, Facebook, and Telegram buttons on
 `/login` and `/signup`. Keep provider secrets only in the Nest API env.
+
+For Telegram, add these URLs in BotFather Web Login settings:
+
+- Trusted Origin: `https://<your-frontend-domain>`
+- Redirect URI: `https://<your-frontend-domain>/api/auth/telegram/callback`
