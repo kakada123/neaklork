@@ -4,10 +4,26 @@ definePageMeta({
   showBottomNav: true,
 });
 
-const { topProducts } = useNeaklorkMock();
+const { topProducts, orders } = useNeaklorkMock();
 
 const activeRange = ref("Today");
 const ranges = ["Today", "This Week", "This Month"];
+
+const reportsSummary = computed(() => {
+  const orderList = orders.value;
+  const paidOrders = orderList.filter((order) => order.paymentStatus === "paid");
+  const unpaidOrders = orderList.filter((order) => order.paymentStatus !== "paid");
+
+  return {
+    totalSales: orderList.reduce(
+      (sum, order) => sum + Number(order.amount.replace(/[^0-9.]/g, "")),
+      0,
+    ),
+    orders: orderList.length,
+    paid: paidOrders.length,
+    unpaid: unpaidOrders.length,
+  };
+});
 </script>
 
 <template>
@@ -71,7 +87,7 @@ const ranges = ["Today", "This Week", "This Month"];
           <strong
             class="mt-[13px] block whitespace-nowrap text-[28px] font-extrabold leading-none tracking-[-0.9px] text-white"
           >
-            $128.00
+            ${{ reportsSummary.totalSales.toFixed(2) }}
           </strong>
         </div>
 
@@ -101,7 +117,7 @@ const ranges = ["Today", "This Week", "This Month"];
           <strong
             class="mt-[10px] block text-[24px] font-extrabold leading-none tracking-[-0.7px] text-white"
           >
-            17
+            {{ reportsSummary.orders }}
           </strong>
         </div>
 
@@ -115,7 +131,7 @@ const ranges = ["Today", "This Week", "This Month"];
           <strong
             class="mt-[10px] block text-[24px] font-extrabold leading-none tracking-[-0.7px] text-white"
           >
-            14
+            {{ reportsSummary.paid }}
           </strong>
         </div>
 
@@ -129,7 +145,7 @@ const ranges = ["Today", "This Week", "This Month"];
           <strong
             class="mt-[10px] block text-[24px] font-extrabold leading-none tracking-[-0.7px] text-white"
           >
-            3
+            {{ reportsSummary.unpaid }}
           </strong>
         </div>
       </div>

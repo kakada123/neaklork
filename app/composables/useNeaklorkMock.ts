@@ -28,133 +28,6 @@ export interface Customer {
   totalSpent: string;
 }
 
-const shop = {
-  name: "Kakada Shop",
-  id: "#10203",
-  owner: "Owner",
-};
-
-const orders: Order[] = [
-  {
-    id: "1023",
-    customerName: "Sara Jones",
-    customerPhone: "02 345 6789",
-    customerInitials: "SJ",
-    productSummary: "Sunglasses x2",
-    amount: "$120.00",
-    timeAgo: "2m ago",
-    status: "new",
-    statusLabel: "New",
-    paymentStatus: "unpaid",
-    paymentLabel: "Unpaid",
-  },
-  {
-    id: "1024",
-    customerName: "Bessie Baker",
-    customerPhone: "07 812 3456",
-    customerInitials: "BB",
-    productSummary: "Laptop x1",
-    amount: "$56.50",
-    timeAgo: "15m ago",
-    status: "confirmed",
-    statusLabel: "Easy",
-    paymentStatus: "paid",
-    paymentLabel: "Paid",
-  },
-  {
-    id: "1025",
-    customerName: "Leslie Alexander",
-    customerPhone: "06 978 6543",
-    customerInitials: "LA",
-    productSummary: "Watch Set x1",
-    amount: "$160.00",
-    timeAgo: "28m ago",
-    status: "confirmed",
-    statusLabel: "Easy",
-    paymentStatus: "unpaid",
-    paymentLabel: "Unpaid",
-  },
-  {
-    id: "1026",
-    customerName: "Guy Hawkins",
-    customerPhone: "01 234 5678",
-    customerInitials: "GH",
-    productSummary: "Shoes x1",
-    amount: "$220.00",
-    timeAgo: "45m ago",
-    status: "packing",
-    statusLabel: "Create",
-    paymentStatus: "paypal",
-    paymentLabel: "Paypal",
-  },
-];
-
-const customers: Customer[] = [
-  {
-    name: "Dora",
-    phone: "02 345 6789",
-    totalOrders: 22,
-    totalSpent: "$345.60",
-  },
-  {
-    name: "Seng Mons",
-    phone: "07 812 3456",
-    totalOrders: 18,
-    totalSpent: "$289.50",
-  },
-  {
-    name: "Bora",
-    phone: "06 978 6543",
-    totalOrders: 12,
-    totalSpent: "$187.20",
-  },
-  {
-    name: "Chantha",
-    phone: "01 234 5678",
-    totalOrders: 24,
-    totalSpent: "$610.75",
-  },
-  {
-    name: "Vichea",
-    phone: "09 978 5432",
-    totalOrders: 16,
-    totalSpent: "$412.30",
-  },
-  { name: "Mey", phone: "01 123 4567", totalOrders: 15, totalSpent: "$368.25" },
-];
-
-const actionItems = [
-  {
-    label: "New orders",
-    count: 3,
-    icon: "need_action_new_orders",
-  },
-  {
-    label: "Need payment",
-    count: 2,
-    icon: "need_action_need_payment",
-  },
-  {
-    label: "Need delivery",
-    count: 4,
-    icon: "need_action_need_delivery",
-  },
-  {
-    label: "Problem orders",
-    count: 1,
-    icon: "need_action_problem_orders",
-  },
-];
-
-const statusTabs = [
-  { label: "New", count: 5 },
-  { label: "Confirmed", count: 3 },
-  { label: "Packing", count: 8 },
-  { label: "Delivering", count: 6 },
-  { label: "Paid" },
-  { label: "Problem" },
-];
-
 const statusOptions = [
   { key: "new", label: "New", icon: "status_new" },
   { key: "confirmed", label: "Confirmed", icon: "status_confirmed" },
@@ -162,14 +35,6 @@ const statusOptions = [
   { key: "delivering", label: "Delivering", icon: "status_delivering" },
   { key: "paid", label: "Paid", icon: "status_paid" },
   { key: "problem", label: "Problem", icon: "status_problem" },
-];
-
-const topProducts = [
-  { name: "Sneakers", amount: "$56.00" },
-  { name: "T-Shirt", amount: "$32.00" },
-  { name: "Laptop", amount: "$120.00" },
-  { name: "Lipstick", amount: "$10.00" },
-  { name: "Watch", amount: "$40.00" },
 ];
 
 const reminderTemplates = [
@@ -185,7 +50,251 @@ const reminderTemplates = [
   },
 ];
 
+interface RawOrder {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  productSummary: string;
+  amountValue: number;
+  minutesAgo: number;
+  status: OrderStatus;
+  statusLabel: string;
+  paymentStatus: PaymentStatus;
+  paymentLabel: string;
+}
+
+const shop = {
+  name: "Kakada Shop",
+  id: "#10203",
+  owner: "Owner",
+};
+
+const rawOrders: RawOrder[] = [
+  {
+    id: "1023",
+    customerName: "Sara Jones",
+    customerPhone: "02 345 6789",
+    productSummary: "Sunglasses x2",
+    amountValue: 120,
+    minutesAgo: 2,
+    status: "new",
+    statusLabel: "New",
+    paymentStatus: "unpaid",
+    paymentLabel: "Unpaid",
+  },
+  {
+    id: "1024",
+    customerName: "Bessie Baker",
+    customerPhone: "07 812 3456",
+    productSummary: "Laptop x1",
+    amountValue: 56.5,
+    minutesAgo: 15,
+    status: "confirmed",
+    statusLabel: "Easy",
+    paymentStatus: "paid",
+    paymentLabel: "Paid",
+  },
+  {
+    id: "1025",
+    customerName: "Leslie Alexander",
+    customerPhone: "06 978 6543",
+    productSummary: "Watch Set x1",
+    amountValue: 160,
+    minutesAgo: 28,
+    status: "confirmed",
+    statusLabel: "Easy",
+    paymentStatus: "unpaid",
+    paymentLabel: "Unpaid",
+  },
+  {
+    id: "1026",
+    customerName: "Guy Hawkins",
+    customerPhone: "01 234 5678",
+    productSummary: "Shoes x1",
+    amountValue: 220,
+    minutesAgo: 45,
+    status: "packing",
+    statusLabel: "Create",
+    paymentStatus: "paypal",
+    paymentLabel: "Paypal",
+  },
+  {
+    id: "1027",
+    customerName: "Dora",
+    customerPhone: "02 345 6789",
+    productSummary: "Perfume x3",
+    amountValue: 95,
+    minutesAgo: 62,
+    status: "delivering",
+    statusLabel: "Delivering",
+    paymentStatus: "paid",
+    paymentLabel: "Paid",
+  },
+  {
+    id: "1028",
+    customerName: "Chantha",
+    customerPhone: "01 234 5678",
+    productSummary: "Backpack x1",
+    amountValue: 74.25,
+    minutesAgo: 88,
+    status: "problem",
+    statusLabel: "Problem",
+    paymentStatus: "partial",
+    paymentLabel: "Partial",
+  },
+];
+
+function formatMoney(amount: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+}
+
+function formatRelativeMinutes(minutesAgo: number) {
+  if (minutesAgo < 60) {
+    return `${minutesAgo}m ago`;
+  }
+
+  const hours = Math.round(minutesAgo / 60);
+  return `${hours}h ago`;
+}
+
+function deriveInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
+function parseProductSummary(summary: string) {
+  const [label = summary] = summary.split(" x");
+  return label;
+}
+
+function groupBy<T>(items: T[], keySelector: (item: T) => string) {
+  const buckets = new Map<string, T[]>();
+
+  for (const item of items) {
+    const key = keySelector(item);
+    const bucket = buckets.get(key) ?? [];
+    bucket.push(item);
+    buckets.set(key, bucket);
+  }
+
+  return buckets;
+}
+
 export function useNeaklorkMock() {
+  const orders = computed<Order[]>(() =>
+    rawOrders.map((order) => ({
+      id: order.id,
+      customerName: order.customerName,
+      customerPhone: order.customerPhone,
+      customerInitials: deriveInitials(order.customerName),
+      productSummary: order.productSummary,
+      amount: formatMoney(order.amountValue),
+      timeAgo: formatRelativeMinutes(order.minutesAgo),
+      status: order.status,
+      statusLabel: order.statusLabel,
+      paymentStatus: order.paymentStatus,
+      paymentLabel: order.paymentLabel,
+    })),
+  );
+
+  const customers = computed<Customer[]>(() => {
+    const grouped = groupBy(rawOrders, (order) => order.customerPhone);
+
+    return Array.from(grouped.values()).map((items) => {
+      const firstItem = items[0];
+      const totalOrders = items.length;
+      const totalSpent = items.reduce((sum, item) => sum + item.amountValue, 0);
+
+      return {
+        name: firstItem.customerName,
+        phone: firstItem.customerPhone,
+        totalOrders,
+        totalSpent: formatMoney(totalSpent),
+      };
+    });
+  });
+
+  const actionItems = computed(() => {
+    const orderList = orders.value;
+
+    return [
+      {
+        label: "New orders",
+        count: orderList.filter((order) => order.status === "new").length,
+        icon: "need_action_new_orders",
+      },
+      {
+        label: "Need payment",
+        count: orderList.filter((order) => order.paymentStatus !== "paid").length,
+        icon: "need_action_need_payment",
+      },
+      {
+        label: "Need delivery",
+        count: orderList.filter((order) => order.status === "delivering").length,
+        icon: "need_action_need_delivery",
+      },
+      {
+        label: "Problem orders",
+        count: orderList.filter((order) => order.status === "problem").length,
+        icon: "need_action_problem_orders",
+      },
+    ];
+  });
+
+  const statusTabs = computed(() => {
+    const orderList = orders.value;
+
+    return statusOptions.map((option) => {
+      const count = orderList.filter((order) => order.status === option.key).length;
+
+      return count > 0 ? { label: option.label, count } : { label: option.label };
+    });
+  });
+
+  const topProducts = computed(() => {
+    const grouped = groupBy(rawOrders, (order) => parseProductSummary(order.productSummary));
+
+    return Array.from(grouped.entries())
+      .map(([name, items]) => ({
+        name,
+        total: items.reduce((sum, item) => sum + item.amountValue, 0),
+      }))
+      .sort((left, right) => right.total - left.total)
+      .slice(0, 5)
+      .map((item) => ({
+        name: item.name,
+        amount: formatMoney(item.total),
+      }));
+  });
+
+  const dashboardSummary = computed(() => {
+    const orderList = orders.value;
+    const sales = rawOrders.reduce((sum, order) => sum + order.amountValue, 0);
+    const unpaid = rawOrders
+      .filter((order) => order.paymentStatus !== "paid")
+      .reduce((sum, order) => sum + order.amountValue, 0);
+
+    return {
+      todayLabel: new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date()),
+      sales: formatMoney(sales),
+      orders: orderList.length,
+      unpaid: formatMoney(unpaid),
+      delivering: orderList.filter((order) => order.status === "delivering").length,
+      recentOrder: orderList[0] ?? null,
+    };
+  });
+
   return {
     shop,
     orders,
@@ -195,5 +304,6 @@ export function useNeaklorkMock() {
     statusOptions,
     topProducts,
     reminderTemplates,
+    dashboardSummary,
   };
 }

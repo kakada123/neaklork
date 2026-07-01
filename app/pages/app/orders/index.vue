@@ -10,6 +10,12 @@ const activeTab = ref("New");
 const sheetOpen = ref(false);
 const selectedStatus = ref("new");
 
+const filteredOrders = computed(() => {
+  const activeStatus = activeTab.value.toLowerCase();
+
+  return orders.value.filter((order) => order.status === activeStatus);
+});
+
 function paymentTone(paymentStatus: string): "orange" | "green" | "blue" {
   if (paymentStatus === "paid") {
     return "green";
@@ -94,7 +100,7 @@ function selectStatus(status: string) {
     <!-- Orders -->
     <section class="flex flex-col gap-[12px]" aria-label="Orders">
       <article
-        v-for="order in orders"
+        v-for="order in filteredOrders"
         :key="order.id"
         class="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-[14px] rounded-[26px] border border-white/90 bg-[var(--surface)] p-4 shadow-[var(--card-shadow)] backdrop-blur-[20px]"
       >

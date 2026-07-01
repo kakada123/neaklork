@@ -10,14 +10,54 @@ const order = computed(
   () => orders.find((item) => item.id === route.params.id) ?? orders[0],
 );
 
-const items = [
-  { label: "Sunscreen", quantity: "x2", amount: "$32.00" },
-  { label: "Serum", quantity: "x1", amount: "$25.00" },
-  { label: "Lipstick", quantity: "x1", amount: "$12.00" },
-  { label: "Shipping", amount: "$5.00" },
-  { label: "Discount", amount: "-$12.00" },
-  { label: "Total", amount: "$72.00", strong: true },
-];
+const items = computed(() => {
+  const [label, quantityPart] = order.value.productSummary.split(" x");
+  const quantity = quantityPart ? `x${quantityPart}` : "";
+  const total = Number(order.value.amount.replace(/[^0-9.]/g, ""));
+
+  return [
+    { label, quantity, amount: order.value.amount },
+    { label: "Shipping", amount: "$5.00" },
+    { label: "Discount", amount: "-$12.00" },
+    { label: "Total", amount: `$${(total - 7).toFixed(2)}`, strong: true },
+  ];
+});
+
+const orderStatusLabel = computed(() => {
+  if (order.value.status === "new") {
+    return "New";
+  }
+
+  if (order.value.status === "confirmed") {
+    return "Confirmed";
+  }
+
+  if (order.value.status === "packing") {
+    return "Packing";
+  }
+
+  if (order.value.status === "delivering") {
+    return "Delivering";
+  }
+
+  if (order.value.status === "problem") {
+    return "Problem";
+  }
+
+  return "Paid";
+});
+
+const paymentTone = computed(() => {
+  if (order.value.paymentStatus === "paid") {
+    return "green";
+  }
+
+  if (order.value.paymentStatus === "paypal") {
+    return "blue";
+  }
+
+  return "orange";
+});
 </script>
 
 <template>
@@ -51,11 +91,11 @@ const items = [
           <p
             class="m-0 mt-[7px] text-[13px] font-medium leading-tight tracking-[-0.15px] text-[var(--muted)]"
           >
-            May 12, 2025 at 10:32 AM
+            {{ order.timeAgo }}
           </p>
         </div>
 
-        <StatusBadge label="New" tone="blue" />
+        <StatusBadge :label="orderStatusLabel" tone="blue" />
       </div>
 
       <div
@@ -149,7 +189,7 @@ const items = [
       <div
         class="grid min-h-[54px] grid-cols-[auto_1fr] items-center gap-[14px]"
       >
-        <StatusBadge label="Unpaid" tone="orange" icon="payment_card" />
+        <StatusBadge :label="order.paymentLabel" :tone="paymentTone" icon="payment_card" />
 
         <span
           class="text-[14px] font-semibold leading-none tracking-[-0.35px] text-[var(--text)]"
@@ -161,11 +201,7 @@ const items = [
       <div
         class="grid min-h-[54px] grid-cols-[auto_1fr] items-center gap-[14px] border-t border-[var(--line)]"
       >
-        <StatusBadge
-          label="Not Yet"
-          tone="purple"
-          icon="delivery_status_truck"
-        />
+        <StatusBadge :label="order.statusLabel" tone="purple" icon="delivery_status_truck" />
 
         <span
           class="text-[14px] font-semibold leading-none tracking-[-0.35px] text-[var(--text)]"

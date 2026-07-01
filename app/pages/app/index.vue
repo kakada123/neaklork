@@ -4,7 +4,7 @@ definePageMeta({
   showBottomNav: true,
 });
 
-const { shop, actionItems } = useNeaklorkMock();
+const { shop, actionItems, dashboardSummary } = useNeaklorkMock();
 const { user } = useAuth();
 
 const displayShopName = computed(() => user.value?.name || shop.name);
@@ -13,6 +13,7 @@ const displayShopId = computed(() =>
 );
 const profilePath = computed(() => `/profile/${user.value?.id ?? "me"}`);
 const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
+const recentOrder = computed(() => dashboardSummary.value.recentOrder);
 </script>
 
 <template>
@@ -87,7 +88,7 @@ const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
         <p
           class="m-0 shrink-0 text-[14px] font-medium leading-none tracking-[-0.25px] text-white/85"
         >
-          May 2, 2025
+          {{ dashboardSummary.todayLabel }}
         </p>
       </div>
 
@@ -119,7 +120,7 @@ const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
             <strong
               class="mt-[13px] block whitespace-nowrap text-[22px] font-extrabold leading-none tracking-[-0.85px] text-white"
             >
-              $128.00
+              {{ dashboardSummary.sales }}
             </strong>
           </div>
 
@@ -134,7 +135,7 @@ const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
             <strong
               class="mt-[13px] block whitespace-nowrap text-[22px] font-extrabold leading-none tracking-[-0.85px] text-white"
             >
-              17
+              {{ dashboardSummary.orders }}
             </strong>
           </div>
 
@@ -149,7 +150,7 @@ const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
             <strong
               class="mt-[13px] block whitespace-nowrap text-[22px] font-extrabold leading-none tracking-[-0.85px] text-white"
             >
-              $24.00
+              {{ dashboardSummary.unpaid }}
             </strong>
           </div>
 
@@ -164,7 +165,7 @@ const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
             <strong
               class="mt-[13px] block whitespace-nowrap text-[22px] font-extrabold leading-none tracking-[-0.85px] text-white"
             >
-              5
+              {{ dashboardSummary.delivering }}
             </strong>
           </div>
         </div>
@@ -227,34 +228,34 @@ const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
 
     <!-- Recent Order Card -->
     <NuxtLink
-      to="/orders/1023"
+      :to="recentOrder ? `/orders/${recentOrder.id}` : '/orders'"
       class="grid min-h-[94px] grid-cols-[auto_minmax(0,1fr)_auto] gap-[14px] rounded-[26px] border border-white/90 bg-[var(--surface)] p-4 pb-[15px] shadow-[var(--card-shadow)] backdrop-blur-[20px]"
     >
-      <img
-        src="/image/customer/1.png"
-        alt="Neth"
-        class="h-12 w-12 rounded-full object-cover object-center"
+      <AvatarBubble
+        :name="recentOrder?.customerName || 'Recent Order'"
+        :initials="recentOrder?.customerInitials || ''"
+        size="sm"
       />
 
       <div class="min-w-0">
         <h3
           class="m-0 truncate text-[17px] font-extrabold leading-tight tracking-[-0.35px] text-[var(--text)]"
         >
-          #1023
-          <span class="ml-2 font-medium">Neth</span>
+          #{{ recentOrder?.id || '----' }}
+          <span class="ml-2 font-medium">{{ recentOrder?.customerName || 'Recent Order' }}</span>
         </h3>
 
         <p
           class="m-0 mt-[7px] inline-flex items-center gap-[6px] text-sm font-medium leading-tight tracking-[-0.15px] text-[var(--muted)]"
         >
           <AppIcon name="products_box" :size="16" />
-          2 items
+          {{ recentOrder?.productSummary || 'No items' }}
         </p>
 
         <p
           class="m-0 mt-[7px] truncate text-sm font-medium leading-tight tracking-[-0.15px] text-[var(--muted)]"
         >
-          Business Park 2
+          {{ recentOrder?.timeAgo || 'Just now' }}
         </p>
       </div>
 
@@ -262,20 +263,14 @@ const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
         <strong
           class="text-[17px] font-extrabold leading-tight tracking-[-0.35px] text-[var(--orange)]"
         >
-          $12.00
+          {{ recentOrder?.amount || '$0.00' }}
         </strong>
 
         <span
           class="mt-2 block text-[15px] font-medium leading-tight tracking-[-0.2px] text-[var(--orange)]"
         >
-          Unpaid
+          {{ recentOrder?.paymentLabel || 'Unpaid' }}
         </span>
-
-        <p
-          class="m-0 mt-[13px] text-sm font-medium leading-tight tracking-[-0.15px] text-[var(--muted)]"
-        >
-          12m ago
-        </p>
       </div>
     </NuxtLink>
   </div>
