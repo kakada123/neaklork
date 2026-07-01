@@ -68,6 +68,7 @@ const telegramClientId = computed(() => config.public.telegramClientId);
 const hasGoogle = computed(() => Boolean(googleClientId.value));
 const hasFacebook = computed(() => Boolean(facebookAppId.value));
 const hasTelegram = computed(() => Boolean(telegramClientId.value));
+const showFacebookLogin = false;
 
 function loadScript(id: string, src: string) {
   return new Promise<void>((resolve, reject) => {
@@ -244,6 +245,7 @@ onMounted(() => {
       </button>
 
       <button
+        v-if="showFacebookLogin"
         class="flex h-[46px] w-full items-center justify-center gap-[10px] rounded-[20px] border border-[#1877f2]/20 bg-white/80 text-[14px] font-black tracking-[-0.2px] text-[#1877f2] shadow-[0_8px_18px_rgba(24,119,242,0.08)] transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         type="button"
         :disabled="!hasFacebook || activeProvider !== null"
