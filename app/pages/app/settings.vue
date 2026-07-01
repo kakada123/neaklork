@@ -15,11 +15,20 @@ const route = useRoute();
 const { shop } = useNeaklorkMock();
 const { user, logout } = useAuth();
 const isLoggingOut = ref(false);
+const showLogoutConfirm = ref(false);
+const profilePath = computed(() => `/profile/${user.value?.id ?? "me"}`);
+const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
 
 const displayShopName = computed(() => user.value?.name || shop.name);
 const displayShopOwner = computed(() => user.value?.email || shop.owner);
 
-const menuItems: MenuItem[] = [
+const menuItems = computed<MenuItem[]>(() => [
+  {
+    label: "Profile",
+    to: profilePath.value,
+    icon: "customers_group",
+    match: (path) => path.startsWith("/profile"),
+  },
   {
     label: "Dashboard",
     to: "/",
@@ -68,11 +77,23 @@ const menuItems: MenuItem[] = [
     icon: "help_circle",
     match: () => false,
   },
-];
+]);
 
 const isActive = (item: MenuItem) => item.match(route.path);
 
 async function handleLogout() {
+  if (isLoggingOut.value) {
+    return;
+  }
+
+  showLogoutConfirm.value = true;
+}
+
+async function confirmLogout() {
+  if (isLoggingOut.value) {
+    return;
+  }
+
   isLoggingOut.value = true;
 
   try {
@@ -90,11 +111,7 @@ async function handleLogout() {
     <section
       class="flex min-h-[74px] items-center gap-[12px] rounded-[28px] border border-white/90 bg-[var(--surface)] py-[13px] pl-[13px] pr-[12px] shadow-[var(--card-shadow)] backdrop-blur-[20px]"
     >
-      <img
-        src="/image/saller/kakada.png"
-        :alt="displayShopName"
-        class="h-12 w-12 flex-none rounded-full object-cover object-center"
-      />
+      <AvatarBubble :name="displayShopName" :src="displayAvatarUrl" size="sm" />
 
       <div class="min-w-0 flex-1">
         <h1
@@ -174,5 +191,61 @@ async function handleLogout() {
         <span class="h-[14px] w-[14px] flex-none" aria-hidden="true" />
       </button>
     </section>
+
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="showLogoutConfirm"
+        class="fixed inset-0 z-50 flex items-end bg-[#0b1020]/45 p-4 backdrop-blur-[2px]"
+        @click.self="showLogoutConfirm = false"
+      >
+        <section
+          class="w-full rounded-[28px] border border-white/90 bg-[var(--surface)] p-4 shadow-[0_30px_80px_rgba(15,23,42,0.3)]"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Logout confirmation"
+        >
+          <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[var(--line)]" />
+
+          <h2
+            class="m-0 text-[18px] font-extrabold leading-none tracking-[-0.35px] text-[var(--text)]"
+          >
+            Log out?
+          </h2>
+
+          <p
+            class="m-0 mt-2 text-[13px] font-medium leading-[1.45] tracking-[-0.2px] text-[var(--muted)]"
+          >
+            You will be signed out from this device and need to log in again.
+          </p>
+
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              class="h-11 rounded-[14px] border border-[var(--line)] bg-transparent text-[14px] font-bold text-[var(--text)]"
+              :disabled="isLoggingOut"
+              @click="showLogoutConfirm = false"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              class="h-11 rounded-[14px] bg-[var(--red)] text-[14px] font-bold text-white shadow-[0_10px_22px_rgba(255,59,86,0.32)] disabled:opacity-70"
+              :disabled="isLoggingOut"
+              @click="confirmLogout"
+            >
+              {{ isLoggingOut ? "Logging out..." : "Yes, log out" }}
+            </button>
+          </div>
+        </section>
+      </div>
+    </Transition>
   </div>
 </template>

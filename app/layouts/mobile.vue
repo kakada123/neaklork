@@ -1,7 +1,14 @@
 <script setup lang="ts">
 const route = useRoute();
+const { user, isReady, fetchMe } = useAuth();
 
 const showBottomNav = computed(() => route.meta.showBottomNav === true);
+
+onMounted(() => {
+  if (!isReady.value && !user.value) {
+    void fetchMe();
+  }
+});
 </script>
 
 <template>

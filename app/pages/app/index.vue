@@ -11,6 +11,8 @@ const displayShopName = computed(() => user.value?.name || shop.name);
 const displayShopId = computed(() =>
   user.value?.id ? `#${user.value.id.slice(-6).toUpperCase()}` : shop.id,
 );
+const profilePath = computed(() => `/profile/${user.value?.id ?? "me"}`);
+const displayAvatarUrl = computed(() => user.value?.avatarUrl || "");
 </script>
 
 <template>
@@ -44,14 +46,10 @@ const displayShopId = computed(() =>
 
     <!-- Shop Card -->
     <NuxtLink
-      to="/settings"
+      :to="profilePath"
       class="flex min-h-[74px] items-center gap-[12px] rounded-[28px] border border-white/90 bg-[var(--surface)] py-[13px] pl-[13px] pr-[12px] shadow-[var(--card-shadow)] backdrop-blur-[20px]"
     >
-      <img
-        src="/image/saller/kakada.png"
-        :alt="displayShopName"
-        class="h-12 w-12 flex-none rounded-full object-cover object-center"
-      />
+      <AvatarBubble :name="displayShopName" :src="displayAvatarUrl" size="sm" />
 
       <div class="min-w-0 flex-1">
         <h2
@@ -233,7 +231,7 @@ const displayShopId = computed(() =>
       class="grid min-h-[94px] grid-cols-[auto_minmax(0,1fr)_auto] gap-[14px] rounded-[26px] border border-white/90 bg-[var(--surface)] p-4 pb-[15px] shadow-[var(--card-shadow)] backdrop-blur-[20px]"
     >
       <img
-        src="/image/customer/o_neth.png"
+        src="/image/customer/1.png"
         alt="Neth"
         class="h-12 w-12 rounded-full object-cover object-center"
       />
