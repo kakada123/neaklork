@@ -202,11 +202,11 @@ async function confirmLogout() {
     >
       <div
         v-if="showLogoutConfirm"
-        class="fixed inset-0 z-50 flex items-end bg-[#0b1020]/45 p-4 backdrop-blur-[2px]"
+        class="fixed inset-0 z-50 flex items-end justify-center bg-[#0b1020]/45 p-4 backdrop-blur-[2px]"
         @click.self="showLogoutConfirm = false"
       >
         <section
-          class="w-full rounded-[28px] border border-white/90 bg-[var(--surface)] p-4 shadow-[0_30px_80px_rgba(15,23,42,0.3)]"
+          class="w-full max-w-[390px] rounded-[28px] border border-white/90 bg-[var(--surface)] p-4 shadow-[0_30px_80px_rgba(15,23,42,0.3)]"
           role="dialog"
           aria-modal="true"
           aria-label="Logout confirmation"
